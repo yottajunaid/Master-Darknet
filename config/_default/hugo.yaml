@@ -5,7 +5,7 @@
 
 # Website name (set in params.yaml under hugoblox.branding.name)
 title: ''
-baseURL: 'https://example.com/' # Website URL
+baseURL: 'https://yottajunaid.github.io/Master-Darknet/' # Website URL
 
 ############################
 ## PAGE OPTIONS
