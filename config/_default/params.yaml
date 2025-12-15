@@ -5,6 +5,7 @@ hugoblox:
     type: organization
     tagline: Master Dark-Net
     description: An Awesome List of Materials to Master the Art of Dark-web and Deep-web. The Most Comprehensive and Deepest guide ever made for Hidden Services.
+    organization: yottajunaid
   theme:
     mode: system
     pack: dracula
