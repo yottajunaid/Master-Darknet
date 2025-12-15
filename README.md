@@ -1,4 +1,4 @@
-# Repository is Under Maintainance, it will be Active within a Month. This is just a template
+# Repository is Under Maintainance, it will be Active before the End of 2025. Star it Now Because soft really cool stuff is yet to come. This is just a template
 
 # [Hugo Docs Theme](https://github.com/HugoBlox/theme-documentation)
 
