@@ -5,7 +5,7 @@ type: landing
 
 design:
   # Default section spacing
-  spacing: "2rem"
+  spacing: "6rem"
 
 sections:
   - block: hero
@@ -23,10 +23,10 @@ sections:
           url: "/blog/"
     design:
       spacing:
-        padding: [10, 0, 10, 0]
+        padding: [20, 0, 20, 0]
         margin: [0, 0, 0, 0]
       # For full-screen, add `min-h-screen` below
-      css_class: ""
+      css_class: "my-custom-class"
       background:
         color: ""
         image:
