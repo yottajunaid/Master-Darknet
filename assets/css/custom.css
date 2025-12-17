@@ -1,23 +1,32 @@
-/* Increase the Main Heading (Title) */
-.hero-title {
-  font-size: 5.5rem !important; /* Forces a much larger size */
-  line-height: 1.1 !important;
-  margin-bottom: 0.5rem !important;
+/* Target the Title - using every possible class Hugo Blox uses */
+.hero-title, .display-1, .section-heading h1 {
+  font-size: 5rem !important; 
+  line-height: 1 !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
-/* Increase the Sub-text (Lead) */
-.hero-lead {
+/* Target the Subtext/Description */
+.hero-lead, .hero-lead p, .section-subheading {
   font-size: 1.8rem !important;
+  line-height: 1.4 !important;
   margin-bottom: 2rem !important;
 }
 
-/* Increase Button Size for "Get Started" */
-.hero-cta .btn {
-  padding: 18px 45px !important; /* Makes button physically larger */
-  font-size: 1.5rem !important;   /* Makes button text larger */
-  font-weight: bold !important;
+/* Target the 'Get Started' Button */
+.hero-cta .btn, .btn-primary, .cta-primary {
+  padding: 20px 60px !important; 
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  display: inline-block !important;
 }
 
+/* Tighten the borders (Remove the big empty gaps) */
+#section-hero, .wg-hero, .fullscreen {
+  padding-top: 20px !important;
+  padding-bottom: 20px !important;
+  min-height: auto !important; /* This stops it from forcing full-screen height */
+}
 /* Reduce the vertical space (Top/Bottom borders) */
 section.wg-hero {
   padding-top: 10px !important;
