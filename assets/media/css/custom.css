@@ -1,24 +1,28 @@
-/* 1. Increase the Main Title Size */
+/* Make the Main Heading Massive */
 .hero-title {
-  font-size: 4rem !important; /* Adjust this number (e.g., 5rem) for even bigger text */
-  margin-bottom: 0.5rem !important;
+  font-size: 5rem !important; /* Original was likely ~2.5rem */
+  line-height: 1.1 !important;
+  font-weight: 800 !important;
+  letter-spacing: -1px;
 }
 
-/* 2. Increase the Subtext (Lead) Size */
+/* Make the Sub-text (Description) Larger */
 .hero-lead {
-  font-size: 1.5rem !important;
-  margin-bottom: 1rem !important;
+  font-size: 1.6rem !important;
+  max-width: 800px; /* Keeps text from stretching too wide */
+  margin: 0 auto 2rem auto !important; 
 }
 
-/* 3. Make the "Get Started" Button Much Larger */
-.hero-cta .btn {
-  padding: 15px 40px !important; /* Increases the clickable area */
-  font-size: 1.25rem !important;  /* Increases the text inside the button */
-  border-radius: 8px !important;
+/* Increase Button Size significantly */
+.hero-cta .btn-primary {
+  padding: 1.2rem 3rem !important; /* Makes the button "chunkier" */
+  font-size: 1.4rem !important;   /* Larger text inside button */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: transform 0.2s ease;
 }
 
-/* 4. Reduce Space Between Content and Page Borders (Top/Bottom) */
-section.wg-hero {
-  padding-top: 2rem !important;    /* Default is often 5rem+ */
-  padding-bottom: 2rem !important;
+/* Optional: Hover effect for that "Epic" feel */
+.hero-cta .btn-primary:hover {
+  transform: scale(1.05);
 }
