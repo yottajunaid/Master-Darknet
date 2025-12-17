@@ -25,6 +25,11 @@ sections:
       spacing:
         padding: [20, 0, 20, 0]
         margin: [0, 0, 0, 0]
+    layout:
+    radius: "none"           # Border radius
+    spacing: "comfortable" # Content density
+    avatar_shape: circle   # circle | square | rounded
+    
       # For full-screen, add `min-h-screen` below
       css_class: "my-custom-class"
       background:
