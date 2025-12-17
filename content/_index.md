@@ -28,7 +28,7 @@ sections:
     layout:
     radius: "none"           # Border radius
     spacing: "comfortable" # Content density
-    avatar_shape: circle   # circle | square | rounded 
+    avatar_shape: circle   # circle | square | rounded
     
       # For full-screen, add `min-h-screen` below
       css_class: "my-custom-class"
