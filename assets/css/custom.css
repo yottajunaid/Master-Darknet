@@ -1,0 +1,25 @@
+/* Increase the Main Heading (Title) */
+.hero-title {
+  font-size: 5.5rem !important; /* Forces a much larger size */
+  line-height: 1.1 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+/* Increase the Sub-text (Lead) */
+.hero-lead {
+  font-size: 1.8rem !important;
+  margin-bottom: 2rem !important;
+}
+
+/* Increase Button Size for "Get Started" */
+.hero-cta .btn {
+  padding: 18px 45px !important; /* Makes button physically larger */
+  font-size: 1.5rem !important;   /* Makes button text larger */
+  font-weight: bold !important;
+}
+
+/* Reduce the vertical space (Top/Bottom borders) */
+section.wg-hero {
+  padding-top: 10px !important;
+  padding-bottom: 10px !important;
+}
