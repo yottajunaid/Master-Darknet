@@ -3,5 +3,4 @@ build:
 template:
   id: "documentation"
   name: "Documentation"
-plugins_css:
-  - custom
+
