@@ -3,14 +3,15 @@ linkTitle: Documentation
 title: Introduction
 ---
 
-👋 Welcome to the demo of the Hugo Blox Documentation template!
+👋 Welcome to the Master DarkNet!
 
 <!--more-->
 
-This site is a demo of the Hugo Blox Documentation theme. For the full documentation on how to use this template, refer to the [Hugo Blox Documentation](https://docs.hugoblox.com/).
+Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
+Template: [Hugo Blox Documentation](https://docs.hugoblox.com/).
 
 ## Next
 
 {{< cards >}}
-  {{< card url="getting-started" title="Get Started" icon="document-text" subtitle="Create your docs in just 5 minutes!" >}}
+  {{< card url="getting-started" title="Get Started" icon="document-text" subtitle="Beginner" >}}
 {{< /cards >}}
