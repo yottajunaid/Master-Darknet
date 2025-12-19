@@ -14,7 +14,7 @@ sections:
       image:
         filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
         focal_point: Center      # Smart, Center, TopLeft, etc.
-        preview_only: false     # true = show on social/lists but HIDE on actual page
+        preview_only: true     # true = show on social/lists but HIDE on actual page
         alt_text: "Logo" # Accessibility text
       text: Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
       primary_action:
@@ -28,7 +28,7 @@ sections:
           url: "/blog/"
     design:
       spacing:
-        padding: [20, 0, 20, 0]
+        padding: [20, 0, 0, 0]
         margin: [0, 0, 0, 0]
     
       # For full-screen, add `min-h-screen` below
