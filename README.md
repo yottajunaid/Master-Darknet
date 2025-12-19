@@ -82,7 +82,7 @@ Upcoming areas include:
 Think of this as **a living textbook**, not a tutorial blog.
 
 * * *
-# Contribute or Add Content to Master-Darknet [click here](https://github.com/yottajunaid/Master-Darknet/contribute/CONTRIBUTING.md) 
+# Contribute or Add Content to Master-Darknet [click here](https://github.com/yottajunaid/Master-Darknet/blob/main/contribute/CONTRIBUTING.md) 
 
 * * *
 ## 🗂️ Documentation Structure
