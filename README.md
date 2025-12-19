@@ -83,7 +83,7 @@ Think of this as **a living textbook**, not a tutorial blog.
 
 * * *
 # Contribute or Add Content to Master-Darknet [click here](https://github.com/yottajunaid/Master-Darknet/blob/main/contribute/CONTRIBUTING.md) 
-
+# Contribute or Add Content to Master-Darknet using Comment [click here](https://gist.github.com/yottajunaid/585ae2cf982ee2786d00d8d99160f9be) 
 * * *
 ## 🗂️ Documentation Structure
 
