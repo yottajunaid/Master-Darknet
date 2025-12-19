@@ -12,7 +12,7 @@ sections:
     content:
       title: Explore and Master the Art of Darknet
       image:
-        filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
+        filename: assets/media/logoimage.jpg  # Path relative to page bundle or in assets/media/
         focal_point: Center      # Smart, Center, TopLeft, etc.
         preview_only: true     # true = show on social/lists but HIDE on actual page
         alt_text: "Logo" # Accessibility text
