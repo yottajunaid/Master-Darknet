@@ -12,10 +12,10 @@ sections:
     content:
       title: Explore and Master the Art of Darknet
       image:
-        filename: logo.svg  # Path relative to page bundle or in assets/media/
-        focal_point: Smart      # Smart, Center, TopLeft, etc.
+        filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
+        focal_point: Center      # Smart, Center, TopLeft, etc.
         preview_only: false     # true = show on social/lists but HIDE on actual page
-        alt_text: "Description" # Accessibility text
+        alt_text: "Logo" # Accessibility text
       text: Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
       primary_action:
         text: Get Started
