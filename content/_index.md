@@ -12,10 +12,8 @@ sections:
     content:
       title: Explore and Master the Art of Darknet
       image:
-        filename: assets/media/logoimage.jpg  # Path relative to page bundle or in assets/media/
+        filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
         focal_point: Center      # Smart, Center, TopLeft, etc.
-        preview_only: true     # true = show on social/lists but HIDE on actual page
-        alt_text: "Logo" # Accessibility text
       text: Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
       primary_action:
         text: Get Started
@@ -37,8 +35,8 @@ sections:
         color: ""
         image:
           # Add your image background to `assets/media/`.
-          filename: ""
+          filename: "logoimage.jpg"
           filters:
-            brightness: 0.5
+            brightness: 0
 
 ---
