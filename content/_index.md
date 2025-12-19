@@ -11,9 +11,6 @@ sections:
   - block: hero
     content:
       title: Explore and Master the Art of Darknet
-      image:
-        filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
-        focal_point: Center      # Smart, Center, TopLeft, etc.
       text: Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
       primary_action:
         text: Get Started
@@ -24,6 +21,9 @@ sections:
         link:
           text: "Read more"
           url: "/blog/"
+    image:
+      filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
+      focal_point: Center      # Smart, Center, TopLeft, etc.
     design:
       spacing:
         padding: [20, 0, 0, 0]
