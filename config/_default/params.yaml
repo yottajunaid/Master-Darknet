@@ -14,7 +14,7 @@ hugoblox:
       secondary: ""
       neutral: ""
   typography:
-    font: sans
+    font: native
     size: md
   layout:
     radius: none
