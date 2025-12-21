@@ -41,4 +41,6 @@ hugoblox:
       enable: true
   search:
     enable: true
-
+  marketing:
+    analytics:
+      google_analytics: 'G-CG24V4GJEC'
