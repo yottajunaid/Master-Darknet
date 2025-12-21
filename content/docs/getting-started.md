@@ -1,36 +1,62 @@
 ---
 title: Getting Started
-date: 2024-02-17
+date: 2025-12-21
 weight: 1
 ---
 
-## Quick Start from Template
+Welcome to the **Master Dark-Net** documentation. This is a comprehensive, academic-grade curriculum designed to deconstruct the technical, sociological, and legal frameworks of hidden networks.
 
-{{% steps %}}
+Unlike surface-level tutorials, this resource offers a deep dive into the architecture of anonymity systems (Tor, I2P, etc.), cryptographic infrastructures, forensic analysis, and the socioeconomic ecosystems that thrive in the dark.
 
-### Initialize a new site
+## Who Is This For?
 
-[Click to copy the template on GitHub](https://github.com/new?template_name=theme-documentation&template_owner=HugoBlox)
+This documentation is built for:
 
-### Configure your new site
+- **Security Researchers & Analysts:** Understand the adversarial dynamics between anonymity and surveillance.
+    
+- **Law Enforcement & Intelligence:** Learn forensic techniques, OSINT adaptation, and jurisdictional challenges.
+    
+- **Sociologists & Economists:** Explore trustless cooperation, darknet markets, and community dynamics.
+    
+- **Students & Academics:** A structured path from historical foundations to post-quantum future theories.
+    
 
-[Configure your site name, description, and menu.](https://docs.hugoblox.com/tutorial/blog/)
+## Prerequisites
 
-### Add your content
+To get the most out of this material, readers should have:
 
-[Edit the homepage and add your documentation pages.](https://docs.hugoblox.com/tutorial/blog/)
+- **Basic Networking Knowledge:** Understanding of TCP/IP, DNS, and routing.
+    
+- **Cryptographic Fundamentals:** Familiarity with public key encryption and hashing is helpful (though covered in Part 2).
+    
+- **Ethical Mindset:** This information is dual-use. We emphasize defense, research, and understanding over exploitation.
 
-### Publish your site
+## Future Goal
 
-[Easily publish your site for free with GitHub Pages](https://docs.hugoblox.com/tutorial/blog/)
+- **This website is yet to Add many more Practical Guides**
+- Upcoming areas include:
 
-{{% /steps %}}
+🌐 Basics of the Dark Web (technical)
 
-## Next
+🧰 Installation & environment setup (Tor, TAILS-OS, I2P, labs)
 
-Let's customize your new site:
+🕵️ Using anonymity networks safely & responsibly
 
-{{< cards >}}
-  {{< card url="../guide/project-structure" title="Project Structure" icon="document-duplicate" >}}
-  {{< card url="../guide/configuration" title="Configuration" icon="adjustments-vertical" >}}
-{{< /cards >}}
+🧪 Z+ Security & threat detection
+
+⚖️ Legal/Illegal frameworks
+
+🧭 Anonymity, surveillance, and misuse
+
+🔍 Forensics & deanonymization (academic perspective)
+
+📊 Case studies (historical, verified, non-fictional)
+
+🗂️ etc..............
+
+Think of this as a living textbook, not a tutorial blog. **Just Bookmark this site, and I will cover every aspects of Daknet**
+# Want to Contribute or Add Content to Master-Darknet [click here](https://github.com/yottajunaid/Master-Darknet/blob/main/contribute/CONTRIBUTING.md) 
+
+## Legal & Ethical Disclaimer
+
+**Master Dark-Net** is an educational and research resource. The techniques discussed involve systems often used for illicit activities. Users are responsible for ensuring their research complies with local laws. This guide advocates for the study of these networks to improve privacy technologies and understand the digital underground, not to participate in illegal acts.
