@@ -166,6 +166,7 @@ This repository will evolve continuously as new modules are added, refined, and 
 
 Star ⭐ the repo to track progress.
 
+![Visitor Count](https://profile-counter.glitch.me/yottajunaid/Master-Darknet/count.svg)
 * * *
 
 ## 📌 Author
