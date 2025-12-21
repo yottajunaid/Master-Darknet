@@ -11,7 +11,7 @@ sections:
   - block: hero
     content:
       title: Explore and Master the Art of Darknet
-      text: Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
+      text: Start Learning the Hidden Internet. Content available from Beginner to Advance and from Advance to Epic
       primary_action:
         text: Get Started
         url: https://yottajunaid.github.io/Master-Darknet/docs/
