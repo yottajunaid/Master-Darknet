@@ -50,11 +50,11 @@ To get the most out of this material, readers should have:
 
 🔍 Forensics & deanonymization (academic perspective)
 
-📊 Case studies (historical, verified, non-fictional)
+📊 Case studies (verified, non-fictional)
 
 🗂️ etc..............
 
-Think of this as a living textbook, not a tutorial blog. **Just Bookmark this site, and I will cover every aspects of Daknet**
+Think of this as a living textbook. **Just Bookmark this site, and I will cover every aspects of Darknet**
 # Want to Contribute or Add Content to Master-Darknet [click here](https://github.com/yottajunaid/Master-Darknet/blob/main/contribute/CONTRIBUTING.md) 
 
 ## Legal & Ethical Disclaimer
