@@ -83,7 +83,7 @@ Documentation follows this hierarchy:
     - Any sources or references used
 
 
-## Or Simply [click here](#) To Paste your Content and we will Add it to our Site.
+## Or Simply [click here](https://gist.github.com/yottajunaid/585ae2cf982ee2786d00d8d99160f9be) To Paste your Content and we will Add it to our Site.
 
 * * *
 
