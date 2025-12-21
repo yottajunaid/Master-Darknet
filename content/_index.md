@@ -14,13 +14,13 @@ sections:
       text: Start Learning the Hidden Internet. Content available from Beginner to Advance and from Advance to Epic
       primary_action:
         text: Get Started
-        url: https://yottajunaid.github.io/Master-Darknet/docs/
+        url: "/Master-Darknet/docs/"
         icon: rocket-launch
       announcement:
         text: "Announcing the release of version 1."
         link:
           text: "Read more"
-          url: "/blog/"
+          url: "/Master-Darknet/blog/"
     image:
       filename: logoimage.jpg  # Path relative to page bundle or in assets/media/
       focal_point: Center      # Smart, Center, TopLeft, etc.
