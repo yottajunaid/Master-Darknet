@@ -6,9 +6,9 @@ weight: 1
 ## Next
 
 {{< cards >}}
-  {{< card url="Module 1 —" title="Module 1" icon="document-text">}}
+  {{< card url="/module-1/_index.md" title="Module 1" icon="document-text">}}
 {{< /cards >}}
 
 {{< cards >}}
-  {{< card url="Module 2 —" title="Module 2" icon="document-text">}}
+  {{< card url="/module-2/_index.md" title="Module 2" icon="document-text">}}
 {{< /cards >}}
