@@ -1,0 +1,7 @@
+<footer class="site-footer">
+  <div class="center-text">
+    <p class="powered-by">
+      {{ with site.Copyright }}{{ . | markdownify }}{{ else }}&copy; {{ now.Year }} {{ site.Title }}{{ end }}
+    </p>
+  </div>
+</footer>
