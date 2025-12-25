@@ -27,9 +27,9 @@ hugoblox:
     align: center
     search: true
     theme_toggle: true
-  footer:
-    style: minimal
-    language_switcher: true
+  #footer:
+    #style: minimal
+    #language_switcher: true
   copyright:
     notice: © {year} {name}
   content:
