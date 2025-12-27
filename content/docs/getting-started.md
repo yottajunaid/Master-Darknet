@@ -8,6 +8,12 @@ Welcome to the **Master Dark-Net** documentation. This is a comprehensive, acade
 
 Unlike surface-level tutorials, this resource offers a deep dive into the architecture of anonymity systems (Tor, I2P, etc.), cryptographic infrastructures, forensic analysis, and the socioeconomic ecosystems that thrive in the dark.
 
+## Start reading 
+
+{{< cards >}}
+  {{< card url="part-1-foundations-of-hidden-networks" title="Click here to start reading" icon="document-text">}}
+{{< /cards >}}
+
 ## Who Is This For?
 
 This documentation is built for:
