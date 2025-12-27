@@ -4,7 +4,7 @@
 # This file is formatted using YAML syntax - learn more at https://learnxinyminutes.com/docs/yaml/
 
 # Website name (set in params.yaml under hugoblox.branding.name)
-title: ''
+title: 'Master Dark-Net'
 baseURL: 'https://yottajunaid.github.io/Master-Darknet/' # Website URL
 
 ############################
@@ -65,7 +65,7 @@ ignoreFiles: [".ipynb_checkpoints$", "\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
 enableInlineShortcodes: true
 disableAliases: true
 outputs:
-  home: [HTML, RSS, WebAppManifest, headers, redirects, backlinks]
+  home: [HTML, RSS, JSON, WebAppManifest, headers, redirects, backlinks]
   page: [HTML]
   section: [HTML, RSS]
 imaging:
