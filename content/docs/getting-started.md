@@ -11,7 +11,7 @@ Unlike surface-level tutorials, this resource offers a deep dive into the archit
 ## Start reading (refer to 3 dots in the top right corner for dropdown menu)
 
 {{< cards >}}
-  {{< card url="/docs/part-1-foundations-of-hidden-networks" title="Click here to start reading" icon="document-text">}}
+  {{< card url="/Master-Darknet/docs/part-1-foundations-of-hidden-networks" title="Click here to start reading" icon="document-text">}}
 {{< /cards >}}
 
 ## Who Is This For?
