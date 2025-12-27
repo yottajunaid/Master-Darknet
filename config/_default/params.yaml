@@ -41,6 +41,7 @@ hugoblox:
       enable: true
   search:
     enable: true
+    provider: fuse
   diagram: true
   marketing:
     analytics:
