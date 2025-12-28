@@ -27,6 +27,10 @@ hugoblox:
     align: center
     search: true
     theme_toggle: true
+  search:
+    enable: true
+    suggestions: []      # Optional: trending searches
+    quick_actions: []    # Optional: quick links in modal
   #footer:
     #style: minimal
     #language_switcher: true
