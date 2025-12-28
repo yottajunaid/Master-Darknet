@@ -33,10 +33,10 @@ hugoblox:
     quick_actions: []    # Optional: quick links in modal
   features:
     search:
-      provider: fuse
+      provider: pagefind
       config:
-        shouldSort: true
-        threshold: 0.5
+        # Pagefind needs very little config
+        max_results: 10
   #footer:  
     #style: minimal
     #language_switcher: true
