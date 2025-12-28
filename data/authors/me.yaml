@@ -15,7 +15,7 @@ affiliations:
   - name: ""
     url: ""
 links:
-  - icon: "globe"
+  - icon: "briefcase"
     url: "https://yottajunaid.github.io/portfolio/"
     label: "Portfolio"
   - icon: "brands/github"
