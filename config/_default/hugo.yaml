@@ -65,7 +65,7 @@ ignoreFiles: [".ipynb_checkpoints$", "\\.Rmd$", "\\.Rmarkdown$", "_cache$"]
 enableInlineShortcodes: true
 disableAliases: true
 outputs:
-  home: [HTML, RSS, JSON, WebAppManifest, headers, redirects, backlinks]
+  home: [HTML, RSS, WebAppManifest, headers, redirects, backlinks]
   page: [HTML]
   section: [HTML, RSS]
 imaging:
