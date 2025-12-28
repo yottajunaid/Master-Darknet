@@ -37,6 +37,8 @@ hugoblox:
       config:
         # Pagefind needs very little config
         max_results: 10
+    sharing:
+    enabled: false
   #footer:  
     #style: minimal
     #language_switcher: true
