@@ -39,26 +39,6 @@ hugoblox:
       enable: true
     reading_time:
       enable: true
-#  search:
-#    enable: true
-#    provider: fuse
-  features:
-    search:
-      provider: fuse
-      config:
-        shouldSort: true
-        threshold: 0.5  # Lower = more exact matching
-        location: 0
-        distance: 100
-        maxPatternLength: 32
-        minMatchCharLength: 2
-        keys:
-          - name: "title"
-            weight: 0.8
-          - name: "summary"
-            weight: 0.5
-          - name: "content"
-            weight: 0.3 
   diagram: true
   marketing:
     analytics:
