@@ -31,7 +31,13 @@ hugoblox:
     enable: true
     suggestions: []      # Optional: trending searches
     quick_actions: []    # Optional: quick links in modal
-  #footer:
+  features:
+    search:
+      provider: fuse
+      config:
+        shouldSort: true
+        threshold: 0.5
+  #footer:  
     #style: minimal
     #language_switcher: true
   copyright:
