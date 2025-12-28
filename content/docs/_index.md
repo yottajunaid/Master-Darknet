@@ -7,8 +7,7 @@ title: Introduction
 
 <!--more-->
 
-Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic
-Template: [Hugo Blox Documentation](https://docs.hugoblox.com/).
+Start Learning the Hidden Internet. Content available from Begineer to Advance and from Advance to Epic.
 
 ## Next
 
