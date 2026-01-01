@@ -13,7 +13,7 @@ sections:
       title: Explore and Master the Art of Darknet
       text: |
         <div style="width: 50%; max-width: 400px; margin: 20px auto;">
-          <img src="/media/icon.png" alt="Icon" style="width: 100%; height: auto;">
+          <img src="/Master-Darknet/static/media/icon.png" alt="Icon" style="width: 100%; height: auto;">
         </div>
         Start Learning the Hidden Internet. Content available from Beginner to Advance and from Advance to Epic
       primary_action:
