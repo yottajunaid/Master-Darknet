@@ -1,6 +1,6 @@
 ---
 title: "Site Index"
-url: "/index"  # This forces the page to load at your-site.com/index
+url: "/site-index"  # This forces the page to load at your-site.com/index
 summary: "A complete hierarchical map of all documentation topics."
 ---
 
