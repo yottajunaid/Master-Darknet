@@ -14,5 +14,9 @@ main:
   - name: Community
     url: community/
     weight: 50
+  - name: Index
+    url: /index
+    weight: 50 
+    # Adjust weight to position it left/right
 
 
