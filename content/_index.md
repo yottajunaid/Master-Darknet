@@ -12,7 +12,7 @@ sections:
     content:
       title: Explore and Master the Art of Darknet
       text: |
-        <div style="width: 50%; max-width: 400px; margin: 20px auto;">
+        <div style="width: 30%; max-width: 300px; margin: 20px auto;">
           <img src="/Master-Darknet/media/icon.png" alt="Icon" style="width: 100%; height: auto;">
         </div>
         Start Learning the Hidden Internet. Content available from Beginner to Advance and from Advance to Epic
@@ -30,7 +30,7 @@ sections:
       # focal_point: Center      # Smart, Center, TopLeft, etc.
     design:
       spacing:
-        padding: [20, 0, 0, 0]
+        padding: [0, 0, 0, 0]
         margin: [0, 0, 0, 0]
     
       # For full-screen, add `min-h-screen` below
