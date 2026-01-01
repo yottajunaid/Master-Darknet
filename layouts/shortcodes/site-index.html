@@ -1,0 +1,39 @@
+{{/* Layouts/shortcodes/site-index.html */}}
+<div class="site-index">
+  <ul>
+    {{/* 1. Start by looping through top-level Sections */}}
+    {{ range .Site.Sections }}
+      {{ template "section-tree-nav" . }}
+    {{ end }}
+  </ul>
+</div>
+
+{{/* 2. Define the recursive template */}}
+{{ define "section-tree-nav" }}
+  <li>
+    <a href="{{ .Permalink }}" style="font-weight: bold; font-size: 1.1em;">📂 {{ .Title }}</a>
+    
+    <ul>
+      {{/* A. Dig deeper into Sub-Sections (Folders) */}}
+      {{ range .Sections }}
+        {{ template "section-tree-nav" . }}
+      {{ end }}
+
+      {{/* B. List the Regular Pages (Markdown files) */}}
+      {{ range .RegularPages }}
+        <li style="margin-top: 0.5em;">
+          <a href="{{ .Permalink }}">📄 {{ .Title }}</a>
+          
+          {{/* C. (Optional) Show Headings/Table of Contents for this page */}}
+          {{/* Note: This pulls the TOC directly from the page content. */}}
+          {{ if .TableOfContents }}
+            <div class="page-toc" style="font-size: 0.85em; margin-left: 20px; color: #666;">
+              {{ .TableOfContents }}
+            </div>
+          {{ end }}
+          
+        </li>
+      {{ end }}
+    </ul>
+  </li>
+{{ end }}
