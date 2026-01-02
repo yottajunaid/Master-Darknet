@@ -1,6 +1,6 @@
 ---
 title: "PART 1 — Foundations of Hidden Networks"
-weight: 4
+weight: 1
 ---
 
 ## Next
