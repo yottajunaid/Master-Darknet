@@ -52,6 +52,8 @@ hugoblox:
     reading_time:
       enable: true
   diagram: true
-  marketing:
-    analytics:
-      google_analytics: 'G-CG24V4GJEC'
+  analytics:
+    google:
+      measurement_id: 'G-CG24V4GJEC'
+    google_tag_manager:
+      container_id: 'GTM-M3WXSH4X'
