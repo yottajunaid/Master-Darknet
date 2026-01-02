@@ -1,6 +1,6 @@
 ---
 title: "PART 6 — The Future & Limits of Anonymity"
-weight: 9
+weight: 6
 ---
 
 ## Next
