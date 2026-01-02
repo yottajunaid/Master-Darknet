@@ -1,6 +1,6 @@
 ---
 title: "PART 2 — Cryptography, Infrastructure & Metadata"
-weight: 5
+weight: 2
 ---
 
 ## Next
