@@ -57,3 +57,11 @@ hugoblox:
       measurement_id: 'G-CG24V4GJEC'
     google_tag_manager:
       container_id: 'GTM-M3WXSH4X'
+  marketing:
+    seo:
+      site_type: Organization
+      org_name: 'Master-Darknet'
+      description: 'Learn Advance concepts of Dark-web and Deep-web'
+    verification:
+      google: "G-CG24V4GJEC"
+      
