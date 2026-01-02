@@ -1,6 +1,6 @@
 ---
 title: "PART 5 — Forensics, Research & Methodology"
-weight: 8
+weight: 5
 ---
 
 ## Next
