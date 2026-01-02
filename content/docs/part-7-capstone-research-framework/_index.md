@@ -1,6 +1,6 @@
 ---
 title: "PART 7 — Capstone Research Framework"
-weight: 7
+weight: 10
 ---
 
 ## Next

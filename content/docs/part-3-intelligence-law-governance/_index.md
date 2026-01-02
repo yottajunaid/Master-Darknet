@@ -1,6 +1,6 @@
 ---
 title: "PART 3 — Intelligence, Law & Governance"
-weight: 3
+weight: 6
 ---
 
 ## Next
