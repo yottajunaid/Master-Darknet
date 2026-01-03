@@ -1,5 +1,6 @@
 ---
 title: "7. Wireless Router and Network Context Assessment"
+weight: 7
 ---
 
 - ## Step 1: Public vs Private Network Identification

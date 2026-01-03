@@ -1,5 +1,6 @@
 ---
 title: "20. Identity Hygiene During First Session"
+weight: 20
 ---
 
 - ## Step 1: No-Login Session Discipline

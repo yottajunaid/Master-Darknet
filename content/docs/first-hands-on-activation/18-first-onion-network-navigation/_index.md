@@ -1,5 +1,6 @@
 ---
 title: "18. First Onion Network Navigation"
+weight: 18
 ---
 
 - ## Step 1: Default Start Page Review

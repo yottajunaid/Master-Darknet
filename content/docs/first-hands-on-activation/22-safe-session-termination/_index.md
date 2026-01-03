@@ -1,5 +1,6 @@
 ---
 title: "22. Safe Session Termination"
+weight: 22
 ---
 
 - ## Step 1: Application Shutdown Order

@@ -1,5 +1,6 @@
 ---
 title: "10. Tor Circuit Establishment (Practical View)"
+weight: 10
 ---
 
 - ## Step 1: Entry Guard Assignment

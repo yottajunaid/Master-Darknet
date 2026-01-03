@@ -1,5 +1,6 @@
 ---
 title: "15. Cryptographic Identity Initialization"
+weight: 15
 ---
 
 - ## Step 1: GPG Key Presence Awareness

@@ -1,5 +1,6 @@
 ---
 title: "3. Burning Tails OS to Bootable Media"
+weight: 3
 ---
 
 

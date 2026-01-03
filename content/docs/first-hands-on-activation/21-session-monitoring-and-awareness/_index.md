@@ -1,5 +1,6 @@
 ---
 title: "21. Session Monitoring and Awareness"
+weight: 21
 ---
 
 - ## Step 1: Tor Circuit Change Events

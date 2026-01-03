@@ -1,5 +1,6 @@
 ---
 title: "11. Opening and Verifying Tor Browser"
+weight: 11
 ---
 
 - ## Step 1: Browser Launch Sequence

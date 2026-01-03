@@ -1,5 +1,6 @@
 ---
 title: "12. Tails Desktop Familiarization"
+weight: 12
 ---
 
 - ## Step 1: Application Menu Layout

@@ -1,5 +1,6 @@
 ---
 title: "17. Time, Locale, and Fingerprinting Awareness"
+weight: 17
 ---
 
 - ## Step 1: System Clock Behavior

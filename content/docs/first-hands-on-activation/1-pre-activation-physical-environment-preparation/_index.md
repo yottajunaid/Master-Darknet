@@ -1,4 +1,7 @@
-## 1. Pre-Activation Physical Environment Preparation
+---
+title: "1. Pre-Activation Physical Environment Preparation"
+weight: 1
+---
 
 - ## Step 1: Choose a Proper Workspace
     

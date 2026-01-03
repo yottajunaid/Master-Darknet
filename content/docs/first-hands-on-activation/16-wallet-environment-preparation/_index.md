@@ -1,5 +1,6 @@
 ---
 title: "16. Wallet Environment Preparation"
+weight: 16
 ---
 
 - ## Step 1: Wallet Application Discovery

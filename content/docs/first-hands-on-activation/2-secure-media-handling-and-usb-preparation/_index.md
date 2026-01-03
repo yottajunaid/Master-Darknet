@@ -1,5 +1,6 @@
 ---
 title: "2. Secure Media Handling and USB Preparation"
+weight: 2
 ---
 
 - ## Step 1: Selection of Trusted USB Media

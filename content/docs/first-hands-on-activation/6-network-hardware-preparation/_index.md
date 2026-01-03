@@ -1,5 +1,6 @@
 ---
 title: "6. Network Hardware Preparation"
+weight: 6
 ---
 
 - ## Step 1: Internal Wi-Fi vs External Adapter Decision

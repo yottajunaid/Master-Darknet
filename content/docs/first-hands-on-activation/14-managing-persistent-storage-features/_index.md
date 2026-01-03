@@ -1,5 +1,6 @@
 ---
 title: "14. Managing Persistent Storage Features"
+weight: 14
 ---
 
 - ## Step 1: Enabling Specific Persistence Options

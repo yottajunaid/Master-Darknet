@@ -1,5 +1,6 @@
 ---
 title: "5. Initial Tails Startup and Welcome Screen"
+weight: 5
 ---
 
 - ## Step 1: Language and Keyboard Context

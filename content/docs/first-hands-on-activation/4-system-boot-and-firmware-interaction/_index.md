@@ -1,5 +1,6 @@
 ---
 title: "4. System Boot and Firmware Interaction"
+weight: 4
 ---
 
 - ## Step 1: Boot Menu Access and Selection

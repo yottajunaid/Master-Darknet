@@ -1,5 +1,6 @@
 ---
 title: "8. Connecting to Wireless Networks via External Adapter"
+weight: 8
 ---
 
 - ## Step 1: Adapter Interface Selection

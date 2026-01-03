@@ -1,5 +1,6 @@
 ---
 title: "23. First-Day Practical Debrief"
+weight: 23
 ---
 
 - ## Step 1: Observed Technical Issues

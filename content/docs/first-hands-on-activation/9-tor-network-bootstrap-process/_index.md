@@ -1,5 +1,6 @@
 ---
 title: "9. Tor Network Bootstrap Process"
+weight: 9
 ---
 
 - ## Step 1: Tor Daemon Initialization Observation

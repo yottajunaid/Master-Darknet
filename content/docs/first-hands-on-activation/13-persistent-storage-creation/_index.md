@@ -1,5 +1,6 @@
 ---
 title: "13. Persistent Storage Creation"
+weight: 13
 ---
 
 - ## Step 1: Persistent Volume Initialization
