@@ -171,3 +171,8 @@ weight: 1
     
 
 * * *
+## Next
+
+{{< cards >}}
+  {{< card url="2-secure-media-handling-and-usb-preparation" title="2-secure-media-handling-and-usb-preparation" icon="document-text">}}
+{{< /cards >}}
