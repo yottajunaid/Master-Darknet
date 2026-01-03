@@ -171,3 +171,9 @@ weight: 5
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/6-network-hardware-preparation" title="6-network-hardware-preparation" icon="document-text">}}
+{{< /cards >}}

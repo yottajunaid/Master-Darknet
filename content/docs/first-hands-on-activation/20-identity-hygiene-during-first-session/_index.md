@@ -165,3 +165,9 @@ weight: 20
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/21-session-monitoring-and-awareness" title="21-session-monitoring-and-awareness" icon="document-text">}}
+{{< /cards >}}

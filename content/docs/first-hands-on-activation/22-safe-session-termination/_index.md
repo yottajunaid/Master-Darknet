@@ -146,3 +146,9 @@ weight: 22
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/23-first-day-practical-debrief" title="23-first-day-practical-debrief" icon="document-text">}}
+{{< /cards >}}

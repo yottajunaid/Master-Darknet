@@ -172,3 +172,11 @@ weight: 23
     
     **Simple idea:**  
     Review today so tomorrow is better.
+
+* * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/brief-installation" title="brief-overview" icon="document-text">}}
+{{< /cards >}}

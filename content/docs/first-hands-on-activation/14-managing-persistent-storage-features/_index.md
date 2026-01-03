@@ -166,3 +166,9 @@ weight: 14
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/15-cryptographic-identity-initialization" title="15-cryptographic-identity-initialization" icon="document-text">}}
+{{< /cards >}}

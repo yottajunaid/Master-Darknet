@@ -188,3 +188,9 @@ weight: 21
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/22-safe-session-termination" title="22-safe-session-termination" icon="document-text">}}
+{{< /cards >}}

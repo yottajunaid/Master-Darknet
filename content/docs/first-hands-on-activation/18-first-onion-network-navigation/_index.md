@@ -180,3 +180,9 @@ weight: 18
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/19-darknet-search-engine-access" title="19-darknet-search-engine-access" icon="document-text">}}
+{{< /cards >}}

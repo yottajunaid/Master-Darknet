@@ -173,3 +173,10 @@ weight: 10
     
     **Simple idea:**  
     Tor handles the hard work in the background.
+
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/11-opening-and-verifying-tor-browser" title="11-opening-and-verifying-tor-browser" icon="document-text">}}
+{{< /cards >}}

@@ -169,3 +169,9 @@ weight: 16
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/17-time-locale-and-fingerprinting-awareness" title="17-time-locale-and-fingerprinting-awareness" icon="document-text">}}
+{{< /cards >}}

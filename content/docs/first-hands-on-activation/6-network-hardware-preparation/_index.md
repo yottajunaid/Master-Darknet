@@ -165,3 +165,9 @@ weight: 6
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/7-wireless-router-and-network-context-assessment" title="7-wireless-router-and-network-context-assessment" icon="document-text">}}
+{{< /cards >}}

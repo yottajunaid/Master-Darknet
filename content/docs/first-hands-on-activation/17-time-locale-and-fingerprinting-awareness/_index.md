@@ -176,3 +176,9 @@ weight: 17
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/18-first-onion-network-navigation" title="18-first-onion-network-navigation" icon="document-text">}}
+{{< /cards >}}

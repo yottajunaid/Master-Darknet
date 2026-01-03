@@ -165,3 +165,9 @@ weight: 19
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/20-identity-hygiene-during-first-session" title="20-identity-hygiene-during-first-session" icon="document-text">}}
+{{< /cards >}}

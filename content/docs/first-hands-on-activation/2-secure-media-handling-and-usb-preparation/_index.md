@@ -166,3 +166,9 @@ weight: 2
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/3-burning-tails-os-to-bootable-media" title="3-burning-tails-os-to-bootable-media" icon="document-text">}}
+{{< /cards >}}

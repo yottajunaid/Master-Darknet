@@ -187,3 +187,9 @@ weight: 7
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/8-connecting-to-wireless-networks-via-external-adapter" title="8-connecting-to-wireless-networks-via-external-adapter" icon="document-text">}}
+{{< /cards >}}

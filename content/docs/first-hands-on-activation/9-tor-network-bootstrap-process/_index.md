@@ -177,3 +177,9 @@ weight: 9
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/10-tor-circuit-establishment-practical-view" title="10-tor-circuit-establishment-practical-view" icon="document-text">}}
+{{< /cards >}}

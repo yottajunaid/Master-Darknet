@@ -168,3 +168,9 @@ weight: 11
     **Simple idea:**  
     Confirm first, browse second.
     
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/12-tails-desktop-familiarization" title="12-tails-desktop-familiarization" icon="document-text">}}
+{{< /cards >}}

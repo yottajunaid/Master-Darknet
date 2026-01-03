@@ -167,3 +167,9 @@ weight: 13
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/14-managing-persistent-storage-features" title="14-managing-persistent-storage-features" icon="document-text">}}
+{{< /cards >}}

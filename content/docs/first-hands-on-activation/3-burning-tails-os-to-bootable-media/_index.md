@@ -156,3 +156,9 @@ weight: 3
 
 * * *
 
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/4-system-boot-and-firmware-interaction" title="4-system-boot-and-firmware-interaction" icon="document-text">}}
+{{< /cards >}}

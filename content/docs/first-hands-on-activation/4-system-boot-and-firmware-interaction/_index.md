@@ -178,3 +178,10 @@ weight: 4
     
 
 * * *
+
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/5-initial-tails-startup-and-welcome-screen" title="5-initial-tails-startup-and-welcome-screen" icon="document-text">}}
+{{< /cards >}}

@@ -182,3 +182,9 @@ weight: 8
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/9-tor-network-bootstrap-process" title="9-tor-network-bootstrap-process" icon="document-text">}}
+{{< /cards >}}

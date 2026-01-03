@@ -162,3 +162,9 @@ weight: 15
     
 
 * * *
+## Next
+
+
+{{< cards >}}
+  {{< card url="/Master-Darknet/docs/first-hands-on-activation/16-wallet-environment-preparation" title="16-wallet-environment-preparation" icon="document-text">}}
+{{< /cards >}}
