@@ -14,6 +14,8 @@ Welcome to the official community hub for **Master-Darknet**. This platform is d
 
 {{< gimage "0001" >}}
 
+{{< gimage "0002" >}}
+
 **What We Do** Our mission is to provide open-source tools and educational resources for mastering darknet technologies. Current projects include:
 
 - **Tor Forensics:** Deep dives into anonymized network investigations.
