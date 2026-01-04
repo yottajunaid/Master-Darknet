@@ -2,20 +2,22 @@
 {{ $imgData := index .Site.Data.images $id }}
 
 {{ if $imgData }}
-  {{/* 1. We take your Google Drive Link */}}
+  {{/* 1. Get the original link from your YAML */}}
   {{ $driveLink := $imgData.link }}
-  
-  {{/* 2. We remove the 'https://' because the proxy adds it */}}
-  {{ $cleanLink := replace $driveLink "https://" "" }}
 
-  {{/* 3. We build the Proxy URL. 'wsrv.nl' fetches and caches the image */}}
-  {{ $proxyUrl := printf "https://wsrv.nl/?url=%s" $cleanLink }}
+  {{/* 2. Extract the FILE ID by removing the first part of the URL */}}
+  {{/* We strip away "https://drive.google.com/uc?export=view&id=" */}}
+  {{ $fileID := replace $driveLink "https://drive.google.com/uc?export=view&id=" "" }}
+
+  {{/* 3. Create the 'Magic Link' which works directly */}}
+  {{ $magicLink := printf "https://lh3.googleusercontent.com/d/%s" $fileID }}
 
   <figure>
-    <img src="{{ $proxyUrl }}" 
+    <img src="{{ $magicLink }}" 
          alt="{{ $imgData.caption }}" 
          loading="lazy"
-         style="max-width: 100%; height: auto;">
+         style="max-width: 100%; height: auto;"
+         referrerpolicy="no-referrer">
          
     {{ with $imgData.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
   </figure>
