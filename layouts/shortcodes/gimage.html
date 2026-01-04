@@ -5,10 +5,12 @@
   {{/* 1. Get the link from YAML */}}
   {{ $driveLink := $imgData.link }}
 
-  {{/* 2. Extract ID and create Magic Link */}}
-  {{/* This handles both "uc?export=view" and standard Drive links safely */}}
+  {{/* 2. Extract ID */}}
   {{ $cleanLink := replace $driveLink "https://drive.google.com/uc?export=view&id=" "" }}
-  {{ $magicLink := printf "https://lh3.googleusercontent.com/d/%s" $cleanLink }}
+  
+  {{/* 3. Create Magic Link with SIZE PARAMETER */}}
+  {{/* 's0' tells Google to return the original size (no compression) */}}
+  {{ $magicLink := printf "https://lh3.googleusercontent.com/d/%s=s0" $cleanLink }}
 
   <figure>
     <img src="{{ $magicLink }}" 
