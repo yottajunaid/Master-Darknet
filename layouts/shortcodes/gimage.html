@@ -2,14 +2,24 @@
 {{ $imgData := index .Site.Data.images $id }}
 
 {{ if $imgData }}
+  {{/* 1. We take your Google Drive Link */}}
+  {{ $driveLink := $imgData.link }}
+  
+  {{/* 2. We remove the 'https://' because the proxy adds it */}}
+  {{ $cleanLink := replace $driveLink "https://" "" }}
+
+  {{/* 3. We build the Proxy URL. 'wsrv.nl' fetches and caches the image */}}
+  {{ $proxyUrl := printf "https://wsrv.nl/?url=%s" $cleanLink }}
+
   <figure>
-    <img src="{{ $imgData.link }}" 
+    <img src="{{ $proxyUrl }}" 
          alt="{{ $imgData.caption }}" 
-         loading="lazy" 
-         referrerpolicy="no-referrer">
+         loading="lazy"
+         style="max-width: 100%; height: auto;">
          
     {{ with $imgData.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
   </figure>
+
 {{ else }}
-  <p style="color:red;">Error: Image ID {{ $id }} not found.</p>
+  <p style="color:red; font-weight:bold;">Error: Image ID {{ $id }} not found.</p>
 {{ end }}
