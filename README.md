@@ -12,7 +12,7 @@ https://yottajunaid.github.io/Master-Darknet/
 
 ## 📘 What is Master-Darknet?
 
-**Master-Darknet** is a long-term, evolving documentation project that explores the **technical, historical, philosophical, and ethical foundations** of the Deep Web, Dark Web, and anonymity networks.
+**Master-Darknet** is a long-term, evolving documentation project that explores the **practical, technical, historical, philosophical, and ethical foundations** of the Deep Web, Dark Web, and anonymity networks.
 
 This repository is being built as a **master-level knowledge base**, combining:
 
