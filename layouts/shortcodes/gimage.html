@@ -1,0 +1,11 @@
+{{ $id := .Get 0 }}
+{{ $imgData := index .Site.Data.images $id }}
+
+{{ if $imgData }}
+  <figure>
+    <img src="{{ $imgData.link }}" alt="{{ $imgData.caption }}" loading="lazy">
+    {{ with $imgData.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
+  </figure>
+{{ else }}
+  <p style="color:red; font-weight:bold;">Error: Image ID {{ $id }} not found in database.</p>
+{{ end }}
