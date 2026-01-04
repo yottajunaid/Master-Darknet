@@ -12,6 +12,8 @@ share: false
 
 Welcome to the official community hub for **Master-Darknet**. This platform is dedicated to cybersecurity enthusiasts, ethical hackers, and researchers interested in the technical depths of the dark web and Tor forensics.
 
+{{< gimage "0001" >}}
+
 **What We Do** Our mission is to provide open-source tools and educational resources for mastering darknet technologies. Current projects include:
 
 - **Tor Forensics:** Deep dives into anonymized network investigations.
