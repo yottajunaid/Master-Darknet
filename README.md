@@ -1,6 +1,6 @@
 # Master-Darknet
 
-**A Structured, Research-Driven Exploration of the Deep Web, Dark Web & Hidden Networks**
+**An Open-Source, Structured, Research-Driven Exploration of the Deep Web, Dark Web & Hidden Networks**
 
 > *Not a guide to crime.  
 > Not a collection of myths.  
