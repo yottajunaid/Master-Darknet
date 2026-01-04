@@ -3,9 +3,13 @@
 
 {{ if $imgData }}
   <figure>
-    <img src="{{ $imgData.link }}" alt="{{ $imgData.caption }}" loading="lazy">
+    <img src="{{ $imgData.link }}" 
+         alt="{{ $imgData.caption }}" 
+         loading="lazy" 
+         referrerpolicy="no-referrer">
+         
     {{ with $imgData.caption }}<figcaption>{{ . }}</figcaption>{{ end }}
   </figure>
 {{ else }}
-  <p style="color:red; font-weight:bold;">Error: Image ID {{ $id }} not found in database.</p>
+  <p style="color:red;">Error: Image ID {{ $id }} not found.</p>
 {{ end }}
