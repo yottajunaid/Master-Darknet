@@ -2,18 +2,24 @@
 {{ $imgData := index .Site.Data.images $id }}
 
 {{ if $imgData }}
-  {{/* 1. Get the original link from your YAML */}}
-  {{ $driveLink := $imgData.link }}
+  {{/* Initialize variables */}}
+  {{ $finalLink := "" }}
+  {{ $rawLink := $imgData.link }}
 
-  {{/* 2. Extract the FILE ID by removing the first part of the URL */}}
-  {{/* We strip away "https://drive.google.com/uc?export=view&id=" */}}
-  {{ $fileID := replace $driveLink "https://drive.google.com/uc?export=view&id=" "" }}
-
-  {{/* 3. Create the 'Magic Link' which works directly */}}
-  {{ $magicLink := printf "https://lh3.googleusercontent.com/d/%s" $fileID }}
+  {{/* LOGIC: Check where the link comes from */}}
+  
+  {{ if in $rawLink "drive.google.com" }}
+    {{/* CASE A: It is a Google Drive Link (JPEG/PNG) -> Apply Magic Link Logic */}}
+    {{ $fileID := replace $rawLink "https://drive.google.com/uc?export=view&id=" "" }}
+    {{ $finalLink = printf "https://lh3.googleusercontent.com/d/%s" $fileID }}
+  
+  {{ else }}
+    {{/* CASE B: It is a GitHub/External Link (SVG) -> Use exactly as is */}}
+    {{ $finalLink = $rawLink }}
+  {{ end }}
 
   <figure>
-    <img src="{{ $magicLink }}" 
+    <img src="{{ $finalLink }}" 
          alt="{{ $imgData.caption }}" 
          loading="lazy"
          style="max-width: 100%; height: auto;"
