@@ -11,8 +11,8 @@ export default defineConfig({
       title: 'Master Darknet',
 
       plugins: [starlightCatppuccin({
-          dark: { flavor: "macchiato", accent: "sky" },
-          light: { flavor: "latte", accent: "sky" },
+          dark: { flavor: "macchiato", accent: "mauve" },
+          light: { flavor: "latte", accent: "mauve" },
         })],
 
       social: [
