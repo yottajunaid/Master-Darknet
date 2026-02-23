@@ -26,7 +26,8 @@ export default defineConfig({
       sidebar: [
         {
           label: 'Documentation',
-          autogenerate: { directory: 'docs' },
+          autogenerate: { directory: 'guides' },
+          collapsed: true, 
         },
       ],
     }),

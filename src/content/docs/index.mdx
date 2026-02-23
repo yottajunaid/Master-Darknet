@@ -1,22 +1,21 @@
 ---
 title: Explore and Master the Art of Darknet
 description: Home Page
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+template: splash
+
 hero:
-  tagline: Start Learning the Hidden Internet. Content available from Beginner to Advance and from Advance to Epic
+  tagline: Start Learning the Hidden Internet
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/icon.png
   actions:
     - text: Get Started
-      link: /guides/example/
+      link: /Master-Darknet/guides/getting-started
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
-      variant: minimal
 ---
 
-import { Card } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+
 
 <Card title="Important Notice" icon="star">
   # This Website is under Maintainance, it will be live on 1 March, 2026. Sorry for the inconvenience 
@@ -25,7 +24,6 @@ import { Card } from '@astrojs/starlight/components';
 
 {/*
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Next steps
 
