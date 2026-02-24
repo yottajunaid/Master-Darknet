@@ -5,21 +5,32 @@ sidebar:
   order: 0
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
-
+import { LinkButton } from '@astrojs/starlight/components';
 
 
 Welcome to the **Master Dark-Net** documentation. This is a comprehensive, academic-grade curriculum designed to deconstruct the technical, sociological, and legal frameworks of hidden networks.
 
 Unlike surface-level tutorials, this resource offers a deep dive into the architecture of anonymity systems (Tor, I2P, etc.), cryptographic infrastructures, forensic analysis, and the socioeconomic ecosystems that thrive in the dark.
 
-## Start reading (refer to 3 dots in the top right corner for dropdown menu)
+### *(refer to 3 dots in the top right corner for dropdown menu OR use the Sidebar)*
 
-{/*
-<CardGrid>
-  <Card title="Click here to start reading" href=".//Master-Darknet/docs/first-hands-on-activation" icon="document-text" />
-</CardGrid>
-*/}
+
+<div style="text-align:center; margin: 2.5rem 0;">
+  <LinkButton
+    href="/Master-Darknet/guides/basics-of-darkweb/"
+    variant="primary"
+    size="lg"
+    style="
+      font-size: 1.35rem;
+      font-weight: 700;
+      padding: 1.2rem 2.6rem;
+      transform: scale(1.08);
+    "
+  >
+    Start Reading
+  </LinkButton>
+</div>
+
 
 ## Who Is This For?
 

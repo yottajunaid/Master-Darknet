@@ -4,16 +4,38 @@ sidebar:
   order: 2
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { LinkButton } from '@astrojs/starlight/components';
 
 
 
-## Next
+<div style="text-align:center; margin: 2.5rem 0;">
+  <LinkButton
+    href="/Master-Darknet/guides/first-hands-on-activation/brief-installation/"
+    variant="primary"
+    size="lg"
+    style="
+      font-size: 1.35rem;
+      font-weight: 700;
+      padding: 1.2rem 2.6rem;
+      transform: scale(1.08);
+    "
+  >
+    Simple Installation (Recommended)
+  </LinkButton>
+</div>
 
-<CardGrid>
-  <Card title="Simple Installation (Recommended)" href="./brief-installation" icon="document-text" />
-</CardGrid>
-
-<CardGrid>
-  <Card title="Detailed Installation" href="./1-pre-activation-physical-environment-preparation" icon="document-text" />
-</CardGrid>
+<div style="text-align:center; margin: 2.5rem 0;">
+  <LinkButton
+    href="/Master-Darknet/guides/first-hands-on-activation/1-pre-activation-physical-environment-preparation/"
+    variant="primary"
+    size="lg"
+    style="
+      font-size: 1.35rem;
+      font-weight: 700;
+      padding: 1.2rem 2.6rem;
+      transform: scale(1.08);
+    "
+  >
+    Detailed Installation
+  </LinkButton>
+</div>
