@@ -1,0 +1,65 @@
+/* ===== MASTER DARKNET WALLPAPER ===== */
+
+:root {
+  --sl-color-bg: #0b0d18;
+}
+
+/* Global background */
+body {
+  background: #0b0d18;
+}
+
+/* Animated gradient layer */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    radial-gradient(circle at 20% 30%, rgba(140, 80, 255, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(80, 160, 255, 0.2), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(180, 120, 255, 0.15), transparent 60%),
+    #0b0d18;
+}
+
+/* Floating particles */
+body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(2px 2px at 40px 60px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2px 2px at 120px 140px, rgba(180,120,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 200px 80px, rgba(120,200,255,0.35), transparent),
+    radial-gradient(2px 2px at 300px 200px, rgba(255,255,255,0.3), transparent);
+
+  background-size: 400px 400px;
+  animation: floatDots 60s linear infinite;
+  opacity: 0.6;
+}
+
+@keyframes floatDots {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(200px,150px); }
+  100% { transform: translate(0,0); }
+}
+
+/* Remove default Starlight backgrounds */
+.sl-container,
+.sl-main,
+.sl-content {
+  background: transparent !important;
+}
+
+
+/* Prevent content being hidden behind floating footer */
+main,
+.sl-container,
+.sl-content {
+  padding-bottom: 120px;
+}

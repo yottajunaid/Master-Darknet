@@ -3,6 +3,8 @@ import starlight from '@astrojs/starlight';
 import starlightCatppuccin from '@catppuccin/starlight'
 import robots from 'astro-robots';
 import sitemap from '@astrojs/sitemap';
+import './src/styles/custom.css';
+import starlightBlog from 'starlight-blog'
 
 export default defineConfig({
   site: 'https://yottajunaid.github.io',
@@ -14,7 +16,7 @@ export default defineConfig({
     plugins: [starlightCatppuccin({
         dark: { flavor: "macchiato", accent: "mauve" },
         light: { flavor: "latte", accent: "mauve" },
-      })],
+      }), starlightBlog()],
 
     social: [
       {
@@ -31,5 +33,15 @@ export default defineConfig({
         collapsed: true, 
       },
     ],
+
+    components: {
+      Footer: './src/components/starlight/Footer.astro',
+    },
+
+    customCss: [
+      './src/styles/custom.css'
+    ],
+
+
   }), robots(), sitemap()],
 });

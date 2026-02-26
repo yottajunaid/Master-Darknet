@@ -1,0 +1,169 @@
+---
+import SocialIcons from 'virtual:starlight/components/SocialIcons';
+---
+
+<footer class="dock-footer">
+  <nav class="dock-menu">
+
+    <a href="/Master-Darknet/" class="dock-item">Home</a>
+    <a href="/Master-Darknet/guides/getting-started/" class="dock-item">Docs</a>
+    <a href="/Master-Darknet/blog/" class="dock-item">Blog</a>
+    <a href="/Master-Darknet/community/" class="dock-item">Community</a>
+    <a href="/Master-Darknet/index/" class="dock-item">Index</a>
+    <a href="/Master-Darknet/contact/" class="dock-item">Contact</a>
+    <a href="/Master-Darknet/about/" class="dock-item">About</a>
+    <a href="/Master-Darknet/privacy/" class="dock-item">Privacy</a>
+    <a href="/Master-Darknet/license/" class="dock-item">License</a>
+
+  </nav>
+</footer>
+
+
+<!-- ======Write Content in===========
+
+src/content/docs/about/index.mdx
+src/content/docs/privacy/index.mdx
+src/content/docs/license/index.mdx
+src/content/docs/contact/index.mdx
+src/content/docs/blog/index.mdx
+src/content/docs/community/index.mdx -->
+
+<style>
+@layer starlight.core {
+
+/* ===============================
+   Floating Dock Container
+================================ */
+
+.dock-footer {
+  position: fixed;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ===============================
+   Glass Bar
+================================ */
+
+.dock-menu {
+  pointer-events: auto;
+
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+
+  padding: 0.7rem 1rem;
+  border-radius: 18px;
+
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 60, 0.75),
+    rgba(50, 30, 90, 0.75)
+  );
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.45),
+    0 0 20px rgba(160,120,255,0.25);
+
+  max-width: calc(100% - 40px);
+}
+
+/* ===============================
+   Menu Items
+================================ */
+
+.dock-item {
+  position: relative;
+
+  padding: 0.55rem 1rem;
+  border-radius: 12px;
+
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+
+  color: var(--sl-color-text);
+  text-decoration: none;
+
+  transition: all 0.25s ease;
+}
+
+/* Glow background */
+
+.dock-item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  border-radius: inherit;
+
+  background: linear-gradient(
+    135deg,
+    rgba(160,120,255,0.35),
+    rgba(120,200,255,0.35)
+  );
+
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  z-index: -1;
+}
+
+/* Hover */
+
+.dock-item:hover {
+  transform: translateY(-2px) scale(1.05);
+  color: white;
+}
+
+.dock-item:hover::before {
+  opacity: 1;
+}
+
+/* Active press */
+
+.dock-item:active {
+  transform: translateY(0) scale(0.97);
+}
+
+/* ===============================
+   Mobile Responsive
+================================ */
+
+@media (max-width: 700px) {
+
+  .dock-menu {
+    gap: 0.4rem;
+    padding: 0.5rem 0.6rem;
+  }
+
+  .dock-item {
+    font-size: 0.8rem;
+    padding: 0.45rem 0.7rem;
+  }
+
+}
+
+/* ===============================
+   Safe Area for iOS
+================================ */
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  .dock-footer {
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+}
+
+}
+</style>
