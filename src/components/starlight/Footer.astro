@@ -9,7 +9,6 @@ import SocialIcons from 'virtual:starlight/components/SocialIcons';
     <a href="/Master-Darknet/guides/getting-started/" class="dock-item">Docs</a>
     <a href="/Master-Darknet/blog/" class="dock-item">Blog</a>
     <a href="/Master-Darknet/community/" class="dock-item">Community</a>
-    <a href="/Master-Darknet/index/" class="dock-item">Index</a>
     <a href="/Master-Darknet/contact/" class="dock-item">Contact</a>
     <a href="/Master-Darknet/about/" class="dock-item">About</a>
     <a href="/Master-Darknet/privacy/" class="dock-item">Privacy</a>
@@ -50,6 +49,46 @@ src/content/docs/community/index.mdx -->
    Glass Bar
 ================================ */
 
+/* ===============================
+   Glass Bar — THEME AWARE
+================================ */
+
+/* DARK MODE */
+
+:root[data-theme="dark"] .dock-menu {
+
+  background: linear-gradient(
+    135deg,
+    rgba(30, 30, 60, 0.75),
+    rgba(50, 30, 90, 0.75)
+  );
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.45),
+    0 0 20px rgba(160,120,255,0.25);
+}
+
+
+/* LIGHT MODE */
+:root[data-theme="light"] .dock-menu {
+
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(240, 240, 255, 0.65)
+  );
+
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  box-shadow:
+    0 8px 30px rgba(0,0,0,0.15),
+    0 0 20px rgba(120, 100, 255, 0.15);
+}
+
+
+/* Shared blur */
 .dock-menu {
   pointer-events: auto;
 
@@ -62,22 +101,28 @@ src/content/docs/community/index.mdx -->
   padding: 0.7rem 1rem;
   border-radius: 18px;
 
-  background: linear-gradient(
-    135deg,
-    rgba(30, 30, 60, 0.75),
-    rgba(50, 30, 90, 0.75)
-  );
-
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
 
-  border: 1px solid rgba(255, 255, 255, 0.08);
-
-  box-shadow:
-    0 8px 30px rgba(0,0,0,0.45),
-    0 0 20px rgba(160,120,255,0.25);
-
   max-width: calc(100% - 40px);
+}
+
+/* DARK hover */
+:root[data-theme="dark"] .dock-item::before {
+  background: linear-gradient(
+    135deg,
+    rgba(160,120,255,0.35),
+    rgba(120,200,255,0.35)
+  );
+}
+
+/* LIGHT hover */
+:root[data-theme="light"] .dock-item::before {
+  background: linear-gradient(
+    135deg,
+    rgba(124,58,237,0.25),
+    rgba(99,102,241,0.25)
+  );
 }
 
 /* ===============================

@@ -1,0 +1,160 @@
+---
+title: "Contact Us"
+---
+
+<style is:global>{`
+
+/* Container */
+.contact-container {
+  display: flex;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+/* Card uses Starlight tokens */
+.contact-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 2.5rem;
+  border-radius: 18px;
+
+  background: var(--sl-color-bg-overlay);
+  border: 1px solid var(--sl-color-border);
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* Heading */
+.contact-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  color: var(--sl-color-text-accent);
+}
+
+.contact-subtitle {
+  text-align: center;
+  color: var(--sl-color-text-secondary);
+  margin-bottom: 2rem;
+  font-size: 0.95rem;
+}
+
+/* Inputs */
+.form-group {
+  position: relative;
+  margin-bottom: 1.4rem;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+
+  border: 1px solid var(--sl-color-border);
+  background: var(--sl-color-bg);
+  color: var(--sl-color-text);
+
+  outline: none;
+  font-size: 0.95rem;
+  transition: 0.2s ease;
+}
+
+.form-group textarea {
+  resize: none;
+}
+
+.form-group label {
+  position: absolute;
+  left: 14px;
+  top: 14px;
+  color: var(--sl-color-text-secondary);
+  font-size: 0.8rem;
+  pointer-events: none;
+  transition: 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  border-color: var(--sl-color-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--sl-color-accent) 25%, transparent);
+}
+
+.form-group input:focus + label,
+.form-group textarea:focus + label,
+.form-group input:not(:placeholder-shown) + label,
+.form-group textarea:not(:placeholder-shown) + label {
+  top: -7px;
+  left: 10px;
+  font-size: 0.7rem;
+  padding: 0 6px;
+  background: var(--sl-color-bg-overlay);
+  color: var(--sl-color-accent);
+}
+
+/* Button — automatically matches Starlight theme */
+.contact-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+
+  color: white;
+  background: linear-gradient(
+    135deg,
+    var(--sl-color-accent),
+    var(--sl-color-accent-high)
+  );
+
+  transition: 0.25s ease;
+}
+
+.contact-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--sl-color-accent) 40%, transparent);
+}
+
+`}</style>
+
+<div class="contact-container">
+
+  <div class="contact-card">
+
+    <div class="contact-title">Get in Touch</div>
+    <div class="contact-subtitle">
+      Have a question or project in mind? Send me a message.
+    </div>
+
+    <form
+      action="https://formspree.io/f/mnjvypky"
+      method="POST"
+    >
+
+      <div class="form-group">
+        <input type="text" name="name" placeholder=" " required />
+        <label>Name</label>
+      </div>
+
+      <div class="form-group">
+        <input type="email" name="email" placeholder=" " required />
+        <label>Email</label>
+      </div>
+
+      <div class="form-group">
+        <textarea name="message" rows="5" placeholder=" " required></textarea>
+        <label>Message</label>
+      </div>
+
+      <button class="contact-btn" type="submit">
+        Send Message 🚀
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
