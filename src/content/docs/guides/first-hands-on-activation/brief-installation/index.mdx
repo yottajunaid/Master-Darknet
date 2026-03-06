@@ -6,7 +6,7 @@ sidebar:
 
 import GImage from '@/components/GImage.astro';
 import { Card, CardGrid } from '@astrojs/starlight/components';
-
+import { LinkCard } from '@astrojs/starlight/components';
 
 
 
@@ -310,6 +310,8 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## Next
 
-<CardGrid>
-  <Card title="Basics of Darkweb" href=".//Master-Darknet/docs/basics-of-darkweb" icon="document-text" />
-</CardGrid>
+<LinkCard
+  title="Basics of Darkweb"
+  href="/Master-Darknet/guides/basics-of-darkweb/"
+  description="Learn the basics of Darkweb"
+/>
