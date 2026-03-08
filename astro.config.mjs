@@ -11,7 +11,8 @@ export default defineConfig({
   base: '/Master-Darknet/',
 
   integrations: [starlight({
-    title: 'Master Darknet',
+    title: 'Master-Darknet',
+    description: 'Explore and master the art of the darknet with practical and theory guides on Tor, Tails OS, anonymity, and operational security.',
 
     plugins: [starlightCatppuccin({
         dark: { flavor: "macchiato", accent: "mauve" },
