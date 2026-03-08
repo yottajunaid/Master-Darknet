@@ -37,6 +37,7 @@ export default defineConfig({
 
     components: {
       Footer: './src/components/starlight/Footer.astro',
+      SocialIcons: './src/components/SocialIcons.astro',
     },
 
     customCss: [
