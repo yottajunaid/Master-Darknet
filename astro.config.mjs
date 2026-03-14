@@ -1,6 +1,5 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
-import starlightCatppuccin from '@catppuccin/starlight'
 import robots from 'astro-robots';
 import sitemap from '@astrojs/sitemap';
 import './src/styles/custom.css';
@@ -15,10 +14,6 @@ export default defineConfig({
     description: 'Explore and master the art of the darknet with practical and theory guides on Tor, Tails OS, anonymity, and operational security.',
 
     plugins: [
-      starlightCatppuccin({
-        dark: { flavor: "macchiato", accent: "mauve" },
-        light: { flavor: "latte", accent: "mauve" },
-      }),
       starlightBlog({
         blog: {
           base: "/blog"
