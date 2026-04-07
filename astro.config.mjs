@@ -46,6 +46,29 @@ export default defineConfig({
       './src/styles/custom.css'
     ],
 
+    head: [
+      {
+        tag: "script",
+        attrs: {
+          async: true,
+          src: "https://www.googletagmanager.com/gtag/js?id=G-CG24V4GJEC"
+        }
+      },
+      {
+        tag: "script",
+        attrs: {
+          src: "/Master-Darknet/ga.js"
+        }
+      },
+      {
+        tag: "meta",
+        attrs: {
+          name: "google-site-verification",
+          content: "XfM4YGF68xXZnflK1KM_HC8cyHQNNmdkfW1O_7A_J50"
+        }
+      }
+    ]
+
 
   }), robots(), sitemap()],
 });
