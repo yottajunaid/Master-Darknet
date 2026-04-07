@@ -1,0 +1,24 @@
+---
+import { SEO } from "astro-seo";
+
+const { title, description } = Astro.props;
+---
+
+<SEO
+  title={title}
+  description={description}
+  canonical={Astro.url.href}
+  titleTemplate="%s | Master Darknet"
+  titleDefault="Master Darknet"
+  openGraph={{
+    basic: {
+      title: title || "Master Darknet",
+      type: "website",
+      image: "https://yottajunaid.github.io/Master-Darknet/og.png",
+      url: Astro.url.href
+    }
+  }}
+  twitter={{
+    card: "summary_large_image"
+  }}
+/>
