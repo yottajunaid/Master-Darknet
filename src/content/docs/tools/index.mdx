@@ -1,0 +1,155 @@
+---
+title: Tools Marketplace
+description: Explore our collection of tools and software.
+template: doc
+---
+
+<div class="tools-grid">
+  <a href="https://github.com/yottajunaid/TOR-Messenger" class="tool-card">
+    <div class="tool-content">
+      <img src="https://github.com/yottajunaid/TOR-Messenger" alt="TOR Messenger" class="tool-image" />
+      <h3 class="tool-title">TOR Messenger</h3>
+      <p class="tool-desc">A secure, private messaging application routed through the Tor network to ensure absolute anonymity.</p>
+      <div class="tool-footer">
+        <span class="tool-category">Privacy & Security</span>
+      </div>
+    </div>
+  </a>
+
+</div>
+
+<style>
+{`
+  /* Base Dark Mode & Purple Theme Variables */
+  :root {
+    --card-bg: rgba(25, 10, 40, 0.6);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --card-glow: rgba(168, 85, 247, 0.35);
+    --text-main: #ffffff;
+    --text-muted: #a1a1aa;
+    --accent: #c084fc;
+    --img-bg: rgba(0, 0, 0, 0.4);
+  }
+
+  /* Starlight Light Mode Overrides */
+  :root[data-theme='light'] {
+    --card-bg: rgba(245, 235, 255, 0.7);
+    --card-border: rgba(168, 85, 247, 0.2);
+    --card-glow: rgba(168, 85, 247, 0.4);
+    --text-main: #1f2937;
+    --text-muted: #4b5563;
+    --accent: #9333ea;
+    --img-bg: rgba(168, 85, 247, 0.1);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .tool-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none !important;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Glowing Sandblasted Hover Effect */
+  .tool-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: radial-gradient(circle at top right, var(--card-glow), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .tool-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--accent);
+    box-shadow: 0 10px 25px -5px var(--card-glow);
+  }
+
+  .tool-card:hover::before {
+    opacity: 1;
+  }
+
+  .tool-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .tool-image {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 1.25rem;
+    border: 1px solid var(--card-border);
+  }
+
+  .placeholder-img {
+    background: var(--img-bg);
+  }
+
+  .tool-title {
+    font-size: 1.25rem !important;
+    font-weight: 600;
+    color: var(--text-main) !important;
+    margin: 0 0 0.5rem 0 !important;
+  }
+
+  .tool-desc {
+    font-size: 0.875rem !important;
+    color: var(--text-muted) !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    flex-grow: 1;
+  }
+
+  .tool-footer {
+    margin-top: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--card-border);
+    padding-top: 0.75rem;
+  }
+
+  .tool-category {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  
+  .tool-arrow {
+    color: var(--text-main);
+    font-size: 1.2rem;
+    transition: transform 0.2s ease;
+  }
+  
+  .tool-card:hover .tool-arrow {
+    transform: translate(3px, -3px);
+  }
+
+`}
+</style>
