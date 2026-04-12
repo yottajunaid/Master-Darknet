@@ -3,11 +3,20 @@ title: Tools Marketplace
 description: Explore our collection of tools and software.
 template: doc
 ---
+import GImage from '@/components/GImage.astro';
 
+{/* <GImage id="0017" /> */}
 <div class="tools-grid">
   <a href="https://github.com/yottajunaid/TOR-Messenger" class="tool-card">
     <div class="tool-content">
-      <img src="https://github.com/yottajunaid/TOR-Messenger" alt="TOR Messenger" class="tool-image" />
+      <img
+        src="https://drive.google.com/thumbnail?id=1Eol-LySPTL2nL3a-tw3u-vREMlUTOGxh&sz=w500"
+        alt="TOR Messenger"
+        class="tool-image"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+        decoding="async"
+       />
       <h3 class="tool-title">TOR Messenger</h3>
       <p class="tool-desc">A secure, private messaging application routed through the Tor network to ensure absolute anonymity.</p>
       <div class="tool-footer">
@@ -15,7 +24,6 @@ template: doc
       </div>
     </div>
   </a>
-
 </div>
 
 <style>
@@ -99,7 +107,7 @@ template: doc
   .tool-image {
     width: 100%;
     height: 140px;
-    object-fit: cover;
+    object-fit: contain;
     border-radius: 8px;
     margin-bottom: 1.25rem;
     border: 1px solid var(--card-border);
