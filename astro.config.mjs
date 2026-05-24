@@ -94,6 +94,50 @@ export default defineConfig({
         },
       },
       {
+        tag: 'link',
+        attrs: {
+          rel: 'icon',
+          type: 'image/png',
+          href: '/Master-Darknet/favicon-96x96.png',
+          sizes: '96x96',
+        },
+      },
+
+      {
+        tag: 'link',
+        attrs: {
+          rel: 'icon',
+          type: 'image/svg+xml',
+          href: '/Master-Darknet/favicon.svg',
+        },
+      },
+
+      {
+        tag: 'link',
+        attrs: {
+          rel: 'shortcut icon',
+          href: '/Master-Darknet/favicon.ico',
+        },
+      },
+
+      {
+        tag: 'link',
+        attrs: {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/Master-Darknet/apple-touch-icon.png',
+        },
+      },
+
+      {
+        tag: 'link',
+        attrs: {
+          rel: 'manifest',
+          href: '/Master-Darknet/site.webmanifest',
+        },
+      },
+
+      {
         tag: "script",
         attrs: {
           async: true,
