@@ -1,0 +1,281 @@
+/* ===== MASTER DARKNET WALLPAPER ===== */
+
+/* ---------- DARK THEME ---------- */
+:root[data-theme="dark"] {
+
+  --sl-color-bg: #0b0d18;
+
+}
+
+/* Dark background */
+:root[data-theme="dark"] body {
+  background: #0b0d18;
+}
+
+/* Animated gradient layer — dark */
+:root[data-theme="dark"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    radial-gradient(circle at 20% 30%, rgba(140, 80, 255, 0.25), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(80, 160, 255, 0.2), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(180, 120, 255, 0.15), transparent 60%),
+    #0b0d18;
+}
+
+/* Floating particles — dark */
+:root[data-theme="dark"] body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(2px 2px at 40px 60px, rgba(255,255,255,0.35), transparent),
+    radial-gradient(2px 2px at 120px 140px, rgba(180,120,255,0.4), transparent),
+    radial-gradient(1.5px 1.5px at 200px 80px, rgba(120,200,255,0.35), transparent),
+    radial-gradient(2px 2px at 300px 200px, rgba(255,255,255,0.3), transparent);
+
+  background-size: 400px 400px;
+  animation: floatDots 60s linear infinite;
+  opacity: 0.6;
+}
+
+
+/* ---------- LIGHT THEME ---------- */
+
+:root[data-theme="light"] body {
+  background: var(--sl-color-bg);
+}
+
+/* Softer gradient for light mode */
+:root[data-theme="light"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+
+  background:
+    radial-gradient(circle at 20% 30%, rgba(140, 80, 255, 0.12), transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(80, 160, 255, 0.10), transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(180, 120, 255, 0.08), transparent 60%),
+    var(--sl-color-bg);
+}
+
+/* Light particles */
+:root[data-theme="light"] body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  z-index: -1;
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(2px 2px at 40px 60px, rgba(0,0,0,0.15), transparent),
+    radial-gradient(2px 2px at 120px 140px, rgba(120,80,255,0.18), transparent),
+    radial-gradient(1.5px 1.5px at 200px 80px, rgba(80,120,255,0.15), transparent);
+
+  background-size: 400px 400px;
+  animation: floatDots 60s linear infinite;
+  opacity: 0.4;
+}
+
+
+/* ---------- SHARED ---------- */
+
+@keyframes floatDots {
+  0% { transform: translate(0,0); }
+  50% { transform: translate(200px,150px); }
+  100% { transform: translate(0,0); }
+}
+
+
+/* Remove default Starlight backgrounds */
+.sl-container,
+.sl-main,
+.sl-content {
+  background: transparent !important;
+}
+
+
+/* Prevent content being hidden behind floating footer */
+main,
+.sl-container,
+.sl-content {
+  padding-bottom: 120px;
+}
+
+
+
+/* ================================
+  CATPPUCIN THEME \/
+  ==================================*/
+
+/* /src/styles/custom.css */
+
+:root {
+  /* Lighter, more vibrant purple tones */
+  --sl-color-accent-low: #4c1d95;
+  --sl-color-accent: #c084fc;       /* Vibrant lighter purple */
+  --sl-color-accent-high: #f3e8ff;  /* Near white purple for highlights */
+
+  --sl-color-text-accent: var(--sl-color-accent);
+}
+
+/* Force the Hero Title to the lighter purple */
+.hero h1 {
+  color: var(--sl-color-accent) !important;
+}
+
+/* Ensure the 'Get Started' button stays bright */
+.sl-link-button.primary {
+  background-color: var(--sl-color-accent) !important;
+  color: #000 !important; /* Black text for better contrast on light purple */
+}
+
+.sl-link-button.primary:hover {
+  background-color: var(--sl-color-accent-high) !important;
+}
+
+
+/* ================================
+  GLASS SIDEBAR AND HEADER \/
+  ==================================*/
+
+/* Glassy Header & Sidebar Styling */
+
+/* Dark Theme (Default) */
+:root {
+  --glass-bg: rgba(15, 23, 42, 0.6); /* Translucent dark */
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+/* Light Theme */
+[data-theme='light'] {
+  --glass-bg: rgba(255, 255, 255, 0.6); /* Translucent light */
+  --glass-border: rgba(0, 0, 0, 0.1);
+}
+
+/* Apply effects to Header */
+header.header {
+  background-color: var(--glass-bg) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* Apply effects to Sidebar */
+starlight-sidebar {
+  background-color: var(--glass-bg) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-right: 1px solid var(--glass-border) !important;
+}
+
+/* Remove default Starlight background containers to prevent overlapping colors */
+.sidebar-pane, .header-content {
+  background-color: transparent !important;
+}
+
+/* Target the mobile sidebar drawer specifically */
+@media (max-width: 50rem) {
+  /* This targets the container that slides out on mobile */
+  .sidebar-pane {
+    background-color: #0f172a !important; /* Solid dark background */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Target the internal padding/scrolling area */
+  .sidebar-content {
+    background-color: #0f172a !important;
+  }
+
+  /* Fix for Light Theme mobile menu */
+  :root[data-theme='light'] .sidebar-pane,
+  :root[data-theme='light'] .sidebar-content {
+    background-color: #ffffff !important;
+  }
+
+  /* Ensure the links don't have weird transparent overlaps */
+  .sidebar-content a {
+    background-color: transparent !important;
+  }
+}
+
+/* Maintain your desktop glass effect separately */
+@media (min-width: 50rem) {
+  header.header, 
+  starlight-sidebar {
+    background-color: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+  }
+}
+
+
+
+/* ================================
+  EXTRA MODERN ADDONS \/
+  ==================================*/
+
+
+/* Shifting gradient in the hero title in the homepage */
+.hero h1 {
+  background: linear-gradient(to right, #c084fc, #7234a2, #c084fc);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-flow 4s linear infinite;
+}
+
+@keyframes gradient-flow {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* Add "Glow" to the Logo */
+
+.hero img {
+  filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.hero img:hover {
+  transform: scale(1.05); /* Subtle zoom when hovering */
+  filter: drop-shadow(0 0 30px rgba(192, 132, 252, 0.6));
+}
+
+/* Smooth Scroll & Custom Scrollbar */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+  background: #4c1d95;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c084fc;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Sidebar "Active Link" Indicator */
+
+[aria-current="page"] {
+  border-left: 3px solid var(--sl-color-accent) !important;
+  padding-left: 0.75rem !important;
+  background-color: rgba(192, 132, 252, 0.1) !important;
+}
