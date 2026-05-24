@@ -32,9 +32,16 @@ export default defineConfig({
     sidebar: [
       {
         label: 'Documentation',
-        autogenerate: { directory: 'guides' },
-        collapsed: true, 
-      },
+        collapsed: true,
+        items: [
+          {
+            autogenerate: {
+              directory: 'guides',
+              collapsed: true,
+            }
+          }
+        ]
+     }
     ],
 
     components: {
@@ -47,6 +54,45 @@ export default defineConfig({
     ],
 
     head: [
+      {
+        tag: 'meta',
+        attrs: {
+          property: 'og:image',
+          content: 'https://yottajunaid.github.io/Master-Darknet/og.png',
+        },
+      },
+
+      {
+        tag: 'meta',
+        attrs: {
+          property: 'og:image:width',
+          content: '1200',
+        },
+      },
+
+      {
+        tag: 'meta',
+        attrs: {
+          property: 'og:image:height',
+          content: '630',
+        },
+      },
+
+      {
+        tag: 'meta',
+        attrs: {
+          name: 'twitter:card',
+          content: 'summary_large_image',
+        },
+      },
+
+      {
+        tag: 'meta',
+        attrs: {
+          name: 'twitter:image',
+          content: 'https://yottajunaid.github.io/Master-Darknet/og.png',
+        },
+      },
       {
         tag: "script",
         attrs: {

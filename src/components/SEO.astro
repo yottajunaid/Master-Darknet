@@ -2,6 +2,9 @@
 import { SEO } from "astro-seo";
 
 const { title, description } = Astro.props;
+
+const image =
+  "https://yottajunaid.github.io/Master-Darknet/og.png";
 ---
 
 <SEO
@@ -14,11 +17,19 @@ const { title, description } = Astro.props;
     basic: {
       title: title || "Master Darknet",
       type: "website",
-      image: "https://yottajunaid.github.io/Master-Darknet/og.png",
       url: Astro.url.href
+    }
+    image: {
+      url: image,
+      alt: "Master Darknet",
+      width: 1200,
+      height: 630,
     }
   }}
   twitter={{
-    card: "summary_large_image"
+    card: "summary_large_image",
+    image: image,
+    title: title || "Master Darknet",
+    description: description  
   }}
 />
