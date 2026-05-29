@@ -3,11 +3,19 @@ import starlight from '@astrojs/starlight';
 import robots from 'astro-robots';
 import sitemap from '@astrojs/sitemap';
 import './src/styles/custom.css';
-import starlightBlog from 'starlight-blog'
+import starlightBlog from 'starlight-blog';
+import mdx from '@astrojs/mdx';
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 
 export default defineConfig({
   site: 'https://yottajunaid.github.io',
   base: '/Master-Darknet/',
+
+  markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
 
   integrations: [starlight({
     title: 'Master-Darknet',
