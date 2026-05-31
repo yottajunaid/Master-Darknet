@@ -62,7 +62,7 @@ Most Dark Web resources are either:
 
 ## 🛠️ Tech Stack
 
-* **Documentation:** [HugoBlox](https://github.com/HugoBlox/hugo-blox-builder) + Markdown
+* **Documentation:** Astro Starlight + MDX
 * **Hosting:** GitHub Pages
 * **Automation:** Python scripts for content structuring.
 
