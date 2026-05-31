@@ -1,0 +1,751 @@
+---
+title: "Tor Hidden Service Descriptor Lifecycle : Birth to Expiry How a .onion descriptor is built, signed, uploaded to HSDir nodes, and expires — with live packet captures."
+description: >
+  How a .onion descriptor is built, signed, uploaded to HSDir nodes,
+  retrieved by clients, rotated across time periods, and eventually
+  expires — including descriptor encryption, blinded keys, HSDir
+  placement algorithms, and packet-capture observability limits.
+author: "yottajunaid"
+authorUrl: "https://yottajunaid.github.io/Master-Darknet"
+keywords:
+  - Tor
+  - onion service
+  - hidden service
+  - Tor hidden service
+  - v3 onion service
+  - hidden service descriptor
+  - HS descriptor
+  - HSDir
+  - hidden service directory
+  - descriptor lifecycle
+  - descriptor upload
+  - descriptor retrieval
+  - descriptor expiry
+  - descriptor encryption
+  - descriptor signing
+  - blinded keys
+  - Ed25519
+  - X25519
+  - subcredential
+  - onion address
+  - introduction points
+  - rendezvous protocol
+  - introduction protocol
+  - hidden service security
+  - Tor specifications
+  - rend-spec-v3
+  - shared random value
+  - SRV
+  - DHT placement
+  - packet capture analysis
+  - anonymity networks
+sidebar:
+  label: "Tor Hidden Service Descriptor Lifecycle"
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+**Author:** yottajunaid                                                                                                                                   
+**Affiliation:** Master-Darknet Research Initiative — Cybersecurity, Forensics & Anonymous Networks Research Division  
+**Contact:** https://yottajunaid.github.io/Master-Darknet/contact  
+**Repository:** https://yottajunaid.github.io/Master-Darknet
+
+---
+
+## Abstract
+
+Version 3 (v3) Tor onion services use a layered cryptographic architecture to publish reachability information — the *hidden service descriptor* — while minimising the information exposed to the relay infrastructure. This paper traces the complete lifecycle of a v3 descriptor from key generation through descriptor construction, dual-layer encryption, HSDir ring placement, upload, client retrieval, rotation, and expiry. Every protocol claim is grounded in the current Tor Rendezvous Specification v3 (rend-spec-v3.txt) and related Tor specifications. We also characterise precisely what an observer can and cannot infer from network-level packet captures, distinguishing observable TLS metadata from protocol elements that are encrypted end-to-end inside Tor circuits. Open problems in descriptor distribution, HSDir security, and measurement methodology are catalogued. The paper is intended as a precise, source-referenced account of v3 onion-service descriptor mechanics for Tor developers, onion-service operators, anonymity researchers, and security engineers.
+
+---
+
+## 1. Introduction
+
+Tor onion services allow a server to accept TCP connections without revealing its IP address or other network location. The mechanism rests on a *hidden service descriptor* (HS descriptor): a signed, encrypted document that maps an onion address to a set of *introduction points* — relay nodes that forward introduction requests from clients to the service.
+
+Tor has operated two major onion-service protocol versions:
+
+- **v2 (deprecated, historical):** Based on 1024-bit RSA and SHA-1; fully specified in `rend-spec-v2.txt`. Deprecated by the Tor Project in 2021 and removed from the Tor network. All discussion of v2 in this paper is explicitly historical.
+- **v3 (current):** Based on Ed25519, X25519, and SHA3-256; fully specified in `rend-spec-v3.txt`. Recognisable by its 56-character onion addresses.
+
+This paper focuses exclusively on the **v3** protocol as currently specified and implemented. Version-specific statements always identify which version they describe.
+
+### 1.1 Scope
+
+This paper traces the complete v3 descriptor lifecycle against the current specification, characterises precisely what network-level packet captures can and cannot reveal, and catalogues known measurement limitations and open research problems.
+
+### 1.2 Terminology
+
+The Tor Project uses "onion service" as the preferred term and "hidden service" as a legacy term still present in specifications and source code. Both are used interchangeably here, following spec notation.
+
+---
+
+## 2. Background: v3 Cryptographic Primitives
+
+The v3 onion-service protocol uses the following cryptographic primitives, as enumerated in the Tor Rendezvous Specification v3:
+
+- **Signing:** Ed25519 (for identity keys, blinded keys, descriptor signing keys, and introduction-point authentication keys).
+- **Key agreement / encryption:** X25519 (Curve25519 Diffie–Hellman).
+- **Hashing:** SHA3-256 for most protocol operations.
+- **Symmetric stream cipher:** AES-256-CTR.
+- **Key derivation:** SHAKE256.
+- **Onion-routing handshake:** ntor using Curve25519.
+
+This contrasts sharply with the deprecated v2 protocol, which used RSA-1024, SHA-1, and DH-1024 group operations.
+
+---
+
+## 3. Stage 1: Onion Address and Identity Key Generation
+
+### 3.1 Master Identity Keypair
+
+A v3 onion service begins with the generation of a long-term **master Ed25519 identity keypair**:
+
+$$
+(K_{S\_hs\_id},\; K_{P\_hs\_id})
+$$
+
+where $K_{S\_hs\_id}$ is the private scalar and $K_{P\_hs\_id}$ is the corresponding Ed25519 public key (32 bytes).
+
+Per the specification, the identity private key is stored in an expanded 64-byte format: the SHA-512 hash of a 32-byte seed, with the first 32 bytes (clamped) used as the scalar and the remaining 32 bytes used as the key's nonce component. Tor's C implementation stores the seed separately as `hs_ed25519_secret_key` and the expanded form as needed.
+
+**Important:** The identity private key is only needed to derive blinded signing keys. The specification explicitly supports offline storage of this key to limit exposure in the event of host compromise. As of Tor 0.3.2.1-alpha, offline key support in the C Tor implementation was noted as not yet implemented for production use, though the specification describes the design.
+
+### 3.2 Onion Address Encoding
+
+The onion address encodes the identity public key, a truncated checksum, and a version byte, all base32-encoded. Per the specification (Section 6 of rend-spec-v3.txt):
+
+$$
+\textit{onion\_address} = \mathrm{base32}(K_{P\_hs\_id} \;\|\; \textit{CHECKSUM} \;\|\; \textit{VERSION}) + \texttt{".onion"}
+$$
+
+$$
+\textit{CHECKSUM} = \mathrm{SHA3\text{-}256}(\texttt{".onion checksum"} \;\|\; K_{P\_hs\_id} \;\|\; \textit{VERSION})[:2]
+$$
+
+where:
+- $K_{P\_hs\_id}$ is the 32-byte Ed25519 master public key.
+- VERSION is a single byte with value `0x03`.
+- The checksum is truncated to 2 bytes before inclusion.
+- `base32` uses the RFC 4648 alphabet (A–Z, 2–7).
+
+The result is a 56-character hostname (35 bytes of payload, base32-encoded). The onion address is self-authenticating: any entity that knows the address can verify that a descriptor was signed by the corresponding private key, without relying on any external PKI.
+
+Example addresses from the specification:
+
+```
+pg6mmjiyjmcrsslvykfwnntlaru7p5svn6y2ymmju6nubxndf4pscryd.onion
+sp3k262uwy4r2k3ycr5awluarykdpag6a7y33jxop4cs2lu5uz5sseqd.onion
+```
+
+### 3.3 Security Properties
+
+The v3 address provides *collision resistance* (a second preimage attack on SHA3-256 or a discrete-log break on Ed25519 would be required to forge) and *binding* (the address encodes the complete public key, not a short hash). This contrasts with deprecated v2 addresses, which encoded only an 80-bit SHA-1 truncation of an RSA-1024 public key — a construction now considered weak.
+
+---
+
+## 4. Stage 2: Key Hierarchy
+
+The v3 protocol defines a hierarchy of keys with different lifetimes and online/offline properties, as defined in the specification.
+
+### 4.1 Master Identity Key
+
+$(K_{P\_hs\_id},\; K_{S\_hs\_id})$ — an Ed25519 keypair; the public component is encoded in the onion address; the private component should be stored offline where possible; never used directly to sign protocol messages.
+
+### 4.2 Blinded Signing Key
+
+$(K_{P\_hs\_blind\_id},\; K_{S\_hs\_blind\_id})$ — an Ed25519 keypair derived from the identity keypair, changing each time period. Used as a DHT index and to certify the descriptor signing key.
+
+### 4.3 Descriptor Signing Key
+
+$(K_{P\_hs\_desc\_sign},\; K_{S\_hs\_desc\_sign})$ — a fresh Ed25519 keypair used to sign the descriptor outer wrapper. The *private* component must be available online on the hidden service host.
+
+### 4.4 Introduction Point Keys (per introduction point)
+
+For each introduction point, the service generates:
+- $(K_{P\_hs\_ipt\_sid},\; K_{S\_hs\_ipt\_sid})$ — Ed25519 authentication keypair used to bind the service session to the introduction point.
+- $(K_{P\_hss\_ntor},\; K_{S\_hss\_ntor})$ — X25519 encryption keypair used during the introduction handshake.
+
+No keypair is shared between two introduction points.
+
+### 4.5 Descriptor Encryption Key (Restricted Discovery)
+
+$(K_{P\_hss\_desc\_enc},\; K_{S\_hss\_desc\_enc})$ — an ephemeral X25519 keypair generated per descriptor when restricted discovery (previously called client authorisation) is in use. A 32-byte random nonce $N_{hs\_desc\_enc}$ (the "descriptor cookie") is also generated per descriptor.
+
+<table>
+  <caption>Table 1: v3 Onion Service Key Hierarchy (per rend-spec-v3.txt)</caption>
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Algorithm</th>
+      <th>Lifetime</th>
+      <th>Online?</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>$K_{P/S\_hs\_id}$</td>
+      <td>Ed25519</td>
+      <td>Permanent</td>
+      <td>No (ideally)</td>
+    </tr>
+    <tr>
+      <td>$K_{P/S\_hs\_blind\_id}$</td>
+      <td>Ed25519 (blinded)</td>
+      <td>Per time period</td>
+      <td>Derived</td>
+    </tr>
+    <tr>
+      <td>$K_{P/S\_hs\_desc\_sign}$</td>
+      <td>Ed25519</td>
+      <td>Per descriptor</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>$K_{P/S\_hs\_ipt\_sid}$</td>
+      <td>Ed25519</td>
+      <td>Per intro point</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>$K_{P/S\_hss\_ntor}$</td>
+      <td>X25519</td>
+      <td>Per intro point</td>
+      <td>Yes</td>
+    </tr>
+    <tr>
+      <td>$K_{P/S\_hss\_desc\_enc}$</td>
+      <td>X25519</td>
+      <td>Per descriptor</td>
+      <td>Yes (if RD enabled)</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+## 5. Stage 3: Time Periods and Shared Random Values
+
+### 5.1 Time Period Definition
+
+The v3 protocol divides time into fixed-duration *time periods* to rotate HSDir positions and blinded keys. Per the specification:
+
+- The time-period length is controlled by the consensus parameter `hsdir-interval`, an integer number of minutes in the range $[30, 14400]$ (30 minutes to 10 days).
+- The **default** time-period length is **1440 minutes (one day)**.
+- Time periods begin at the Unix epoch (Jan 1, 1970 00:00 UTC) and are indexed by dividing the number of elapsed minutes by the period length, after subtracting a "rotation time offset" of $12 \times 60 = 720$ minutes.
+
+Formally, using consensus `valid-after` time as the reference:
+
+$$
+\textit{period\_num} = \left\lfloor \frac{\textit{minutes\_since\_epoch} - 720}{\textit{hsdir-interval}} \right\rfloor
+$$
+
+This offset aligns period boundaries with the shared-random-value (SRV) voting schedule.
+
+### 5.2 Shared Random Values
+
+Each period, Tor directory authorities collaboratively generate a *shared random value* (SRV) using a commit-and-reveal scheme. Consensuses publish two SRVs: the current one and the previous one. SRVs are used to compute relay positions in the HSDir hash ring, making it unpredictable far in advance which relays will be responsible for a given descriptor.
+
+---
+
+## 6. Stage 4: Blinded Key Derivation and Subcredential
+
+### 6.1 Credential
+
+From the public identity key, a *credential* is derived:
+
+$$
+N_{hs\_cred} = \mathrm{SHA3\text{-}256}(\texttt{"credential"} \;\|\; K_{P\_hs\_id})
+$$
+
+The credential is stable across all periods.
+
+### 6.2 Blinded Key Derivation
+
+Per Appendix A of rend-spec-v3.txt, the blinded keys for a given period are derived using an Ed25519 key-blinding scheme. Let $(a, A)$ be the master identity keypair where $A = aB$ and $B$ is the Ed25519 basepoint. A blinding factor is computed as:
+
+$$
+h = \mathrm{SHA3\text{-}256}(\textit{BLIND\_STRING} \;\|\; A \;\|\; s \;\|\; B \;\|\; N)
+$$
+
+where:
+
+$$
+\textit{BLIND\_STRING} = \texttt{"Derive temporary signing key"} \;\|\; \texttt{0x00}
+$$
+
+$$
+N = \texttt{"key-blind"} \;\|\; \mathrm{INT\_8}(\textit{period\_num}) \;\|\; \mathrm{INT\_8}(\textit{period\_length})
+$$
+
+and $s$ is an optional per-client secret (empty for public services).
+
+The blinding factor $h$ is then clamped per the Ed25519 specification:
+
+```
+h[0] &= 248;   h[31] &= 63;   h[31] |= 64;
+```
+
+Blinded keys:
+
+$$
+K_{S\_hs\_blind\_id} = h \cdot a \pmod{\ell}
+$$
+
+$$
+K_{P\_hs\_blind\_id} = h \cdot A = (ha)B
+$$
+
+where $\ell$ is the Ed25519 group order. This produces a valid Ed25519 keypair for the period. Any party knowing $K_{P\_hs\_id}$ can compute $K_{P\_hs\_blind\_id}$ for any period. No party can reverse the process to recover $K_{S\_hs\_id}$ from $K_{S\_hs\_blind\_id}$.
+
+### 6.3 Subcredential
+
+A *subcredential* is derived per period:
+
+$$
+N_{hs\_subcred} = \mathrm{SHA3\text{-}256}(\texttt{"subcredential"} \;\|\; N_{hs\_cred} \;\|\; K_{P\_hs\_blind\_id})
+$$
+
+Knowledge of the subcredential is required to decrypt the first layer of the HS descriptor. HSDirs cannot decrypt descriptors they store because they do not know the service's onion address and therefore cannot derive the subcredential.
+
+---
+
+## 7. Stage 5: Descriptor Construction
+
+A v3 HS descriptor has a three-layer structure:
+
+1. **Outer wrapper** (partially plaintext, signed): Contains metadata and the outer ciphertext.
+2. **First encryption layer** (superencrypted): Decryptable by any party knowing the onion address. Contains second-layer ciphertext and restricted-discovery parameters.
+3. **Second encryption layer** (encrypted): If restricted discovery is enabled, requires the descriptor cookie. Contains the introduction point list and service metadata.
+
+### 7.1 Outer Wrapper Fields
+
+Per the specification ([DESC-OUTER]), the outer wrapper contains:
+
+```
+hs-descriptor 3
+descriptor-lifetime <LifetimeMinutes>
+descriptor-signing-key-cert
+  <Ed25519 certificate: blinded key certifies desc-sign key>
+revision-counter <integer>
+superencrypted
+  -----BEGIN MESSAGE-----
+  <base64 first-layer ciphertext>
+  -----END MESSAGE-----
+signature <Ed25519 signature>
+```
+
+Key constraints from the specification:
+
+- `descriptor-lifetime`: An integer in the range $[30, 720]$ minutes (30 minutes to 12 hours). The HSDir **SHOULD** expire the descriptor at least this many minutes after upload.
+- `descriptor-signing-key-cert`: An Ed25519 certificate (per Tor proposal 220) of type `[08]`, in which the blinded signing key cross-certifies the descriptor signing key. This structure means the service need not have the blinded private key online.
+- `revision-counter`: A monotonically increasing 64-bit integer. HSDirs keep the descriptor with the higher revision-counter value.
+- `signature`: An Ed25519 signature over all prior fields, using $K_{S\_hs\_desc\_sign}$, prefixed with `"Tor onion service descriptor sig v3"`.
+
+HSDirs accept descriptors of up to 50,000 bytes (50 kB).
+
+### 7.2 First Encryption Layer
+
+Per [HS-DESC-ENC] in the specification, the first-layer encryption uses:
+
+$$
+\textit{SECRET\_DATA} = K_{P\_hs\_blind\_id}
+$$
+
+$$
+\textit{STRING\_CONSTANT} = \texttt{"hsdir-superencrypted-data"}
+$$
+
+Encryption keys are derived from $N_{hs\_subcred}$ and $\textit{SECRET\_DATA}$ using a KDF, then AES-256-CTR is applied. Before encryption, the plaintext is padded with NUL bytes to the nearest multiple of 10,000 bytes (10 kB) — this padding hides the size of the introduction-point list.
+
+The first-layer plaintext contains:
+
+- `desc-auth-type`: Always `"x25519"`, regardless of whether restricted discovery is enabled, to avoid leaking configuration.
+- `desc-auth-ephemeral-key`: An ephemeral X25519 public key generated by the service.
+- `auth-client` lines: One per authorised client when restricted discovery is enabled. When restricted discovery is disabled, fake entries of identical format are included. Descriptors always contain a number of `auth-client` lines that is a multiple of 16 to avoid leaking the client count.
+- `encrypted`: The second-layer ciphertext.
+
+### 7.3 Second Encryption Layer
+
+Per [HS-DESC-ENC] in the specification:
+
+$$
+\textit{SECRET\_DATA} = K_{P\_hs\_blind\_id} \;\|\; N_{hs\_desc\_enc}
+$$
+
+$$
+\textit{STRING\_CONSTANT} = \texttt{"hsdir-encrypted-data"}
+$$
+
+where $N_{hs\_desc\_enc}$ is the descriptor cookie (32 random bytes) when restricted discovery is enabled, and is empty otherwise.
+
+The second-layer plaintext contains the introduction-point list. For each introduction point:
+
+- Link specifiers (IP address, port, relay identity).
+- `onion-key ntor`: Base64-encoded X25519 onion key ($K_{P\_ntor}$) for the introduction-point relay.
+- `auth-key`: Certificate binding $K_{P\_hs\_ipt\_sid}$ to $K_{P\_hs\_desc\_sign}$ (certificate type `[09]`).
+- `enc-key ntor`: Base64-encoded $K_{P\_hss\_ntor}$, the service's per-introduction-point X25519 encryption key.
+- `enc-key-cert`: Certificate binding $K_{P\_hss\_ntor}$ to $K_{P\_hs\_desc\_sign}$.
+
+The second layer may also optionally contain `pow-params` lines for the proof-of-work client puzzle mechanism introduced in Tor 0.4.8.1-alpha.
+
+---
+
+## 8. Stage 6: Descriptor Signing
+
+After the outer wrapper is assembled, it is signed:
+
+$$
+\sigma = \mathrm{Ed25519Sign}\bigl(K_{S\_hs\_desc\_sign},\;\texttt{"Tor onion service descriptor sig v3"} \;\|\; \textit{outer\_fields}\bigr)
+$$
+
+The certificate in `descriptor-signing-key-cert` creates a chain:
+
+$$
+K_{S\_hs\_blind\_id} \xrightarrow{\text{certifies}} K_{P\_hs\_desc\_sign} \xrightarrow{\text{signs}} \text{descriptor}
+$$
+
+Any party knowing the onion address can: (1) derive $K_{P\_hs\_blind\_id}$ for the current period, (2) verify the certificate using $K_{P\_hs\_blind\_id}$, and (3) verify the descriptor signature using $K_{P\_hs\_desc\_sign}$.
+
+HSDirs can verify that a descriptor was signed by the correct blinded key for the current period, without learning the service's onion address. This is a key privacy improvement over v2, where the address appeared directly in the uploaded descriptor.
+
+---
+
+## 9. Stage 7: HSDir Ring Placement
+
+### 9.1 Overview
+
+Descriptors are distributed across multiple HSDirs in a DHT-like structure. Placement depends on the blinded public key, the shared random value (SRV), the time period, and per-relay identity keys — all of which change periodically.
+
+### 9.2 HSDir Eligibility
+
+Per the specification, descriptors are published to Tor servers with:
+- the `HSDir` relay flag,
+- the `HSDir=2` subprotocol capability, and
+- Tor version ≥ 0.3.0.8.
+
+### 9.3 Consensus Parameters
+
+Three consensus parameters control HSDir spread:
+
+<table>
+  <caption>Table 2: HSDir Spread Consensus Parameters</caption>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Range</th>
+      <th>Default</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>hsdir_n_replicas</code></td>
+      <td>[1, 16]</td>
+      <td>2</td>
+      <td>Number of independent ring positions per service</td>
+    </tr>
+    <tr>
+      <td><code>hsdir_spread_store</code></td>
+      <td>[1, 128]</td>
+      <td>4</td>
+      <td>HSDirs to upload to per replica</td>
+    </tr>
+    <tr>
+      <td><code>hsdir_spread_fetch</code></td>
+      <td>[1, 128]</td>
+      <td>3</td>
+      <td>HSDirs a client may choose from per replica</td>
+    </tr>
+  </tbody>
+</table>
+
+With defaults, a service uploads to $2 \times 4 = 8$ HSDirs (with deduplication), and a client can fetch from up to $2 \times 3 = 6$ HSDirs.
+
+### 9.4 Service Index Computation
+
+For each replica number $r \in \{1,\ldots,\texttt{hsdir\_n\_replicas}\}$:
+
+$$
+\textit{hs\_service\_index}(r) = \mathrm{SHA3\text{-}256}\bigl(\texttt{"store-at-idx"} \;\|\; K_{P\_hs\_blind\_id} \;\|\; \mathrm{INT\_8}(r) \;\|\; \mathrm{INT\_8}(\textit{period\_length}) \;\|\; \mathrm{INT\_8}(\textit{period\_num})\bigr)
+$$
+
+### 9.5 Relay Index Computation
+
+For each relay in the consensus carrying the `HSDir` flag:
+
+$$
+\textit{hs\_relay\_index}(\textit{node}) = \mathrm{SHA3\text{-}256}\bigl(\texttt{"node-idx"} \;\|\; \textit{node\_identity} \;\|\; \textit{shared\_random\_value} \;\|\; \mathrm{INT\_8}(\textit{period\_num}) \;\|\; \mathrm{INT\_8}(\textit{period\_length})\bigr)
+$$
+
+where `node_identity` is the relay's Ed25519 identity key.
+
+### 9.6 HSDir Selection
+
+Relays are sorted by their relay index values, forming a circular ring. For each replica $r$, the service uploads to the first `hsdir_spread_store` relays whose index immediately follows `hs_service_index(r)` in the ring. Relays already selected for a lower-numbered replica are skipped to avoid duplication.
+
+---
+
+## 10. Stage 8: Descriptor Upload Procedure
+
+### 10.1 Upload Timing and Overlap
+
+Services maintain **two active descriptors** at all times to ensure reachability across consensus-time skew:
+
+- The **first descriptor** covers clients with an older consensus (previous time period or SRV).
+- The **second descriptor** covers clients with the same or newer consensus.
+
+Services rotate descriptors whenever they receive a consensus with a `valid-after` time past the next SRV calculation time.
+
+After uploading, the service schedules a re-upload after a random delay uniformly distributed in $[60, 120]$ minutes. This jittered schedule avoids a "thundering herd" where all services upload simultaneously at period boundaries.
+
+### 10.2 Transport Mechanism
+
+Uploads are performed anonymously over a 3-hop Tor circuit to each target HSDir. Over the circuit, the service issues an HTTP `POST` request to the HSDir's directory port using the `/tor/hs/3/publish` endpoint. The request body contains the descriptor text.
+
+Upon receiving a descriptor, an HSDir performs the following checks:
+
+1. The outer wrapper can be parsed per [DESC-OUTER].
+2. The version number is "3".
+3. If the HSDir already has a descriptor for this blinded key, the new descriptor's `revision-counter` must be strictly greater.
+4. The `descriptor-signing-key-cert` signature is valid.
+5. The outer signature is valid.
+6. The descriptor size is within the 50 kB limit.
+
+### 10.3 Introduction Circuit Setup
+
+Before constructing the descriptor, the service must establish introduction circuits:
+
+1. The service builds a 3-hop anonymous circuit to a candidate relay.
+2. It sends an `ESTABLISH_INTRO` relay message on that circuit, containing $K_{P\_hs\_ipt\_sid}$ and a MAC binding the key to the circuit (`HANDSHAKE_AUTH`).
+3. The relay verifies the message and replies with `INTRO_ESTABLISHED`.
+4. The service includes the introduction point's link specifiers and $K_{P\_hss\_ntor}$ in the descriptor.
+
+The service implements DoS rate limiting via the `DOS_PARAMS` extension in `ESTABLISH_INTRO`, available from Tor 0.4.2.1-alpha, controlling the token-bucket rate and burst for `INTRODUCE2` messages.
+
+---
+
+## 11. Stage 9: Client Descriptor Retrieval
+
+### 11.1 Computing the Fetch Target
+
+A client knowing the onion address can:
+
+1. Determine the current time period number using its latest consensus `valid-after` time.
+2. Derive $K_{P\_hs\_blind\_id}$ for that period.
+3. Compute the relay and service indices exactly as in Section 9.
+4. Select one of the first `hsdir_spread_fetch` HSDirs after each service index as the fetch target.
+
+Clients use the consensus `valid-after` time (not system clock) for all time-based decisions.
+
+### 11.2 SRV Selection Logic
+
+The specification defines precise rules for matching SRVs to time periods during the transition window:
+
+- *Between a new SRV and a new time period* ("=" phase): clients use current time period with the **previous** SRV.
+- *Between a new time period and a new SRV* ("—" phase): clients use current time period with the **current** SRV.
+
+### 11.3 Fetch HTTP Request
+
+The client issues an HTTP `GET` request to the target HSDir via an anonymous 3-hop circuit, using the endpoint `/tor/hs/3/<base64-blinded-pubkey>`. The HSDir returns the descriptor ciphertext. The client then:
+
+1. Verifies the outer signature using the derived $K_{P\_hs\_blind\_id}$.
+2. Decrypts the first encryption layer using $N_{hs\_subcred}$.
+3. If restricted discovery is enabled, decrypts the descriptor cookie using its own X25519 private key.
+4. Decrypts the second layer to obtain the introduction-point list.
+
+---
+
+## 12. Stage 10: Introduction Point Discovery and Rendezvous
+
+After obtaining the decrypted introduction-point list, the client:
+
+1. Selects a Tor relay at random to serve as the *rendezvous point* and builds a 3-hop circuit to it.
+2. Sends a `RELAY_COMMAND_ESTABLISH_RENDEZVOUS` cell; the rendezvous point confirms with `RELAY_COMMAND_RENDEZVOUS_ESTABLISHED`.
+3. Builds a separate 3-hop circuit to an introduction point.
+4. Sends an `INTRODUCE1` message to the introduction point, containing the rendezvous point link specifiers, a rendezvous cookie, and a Diffie–Hellman first message (ntor handshake) encrypted to $K_{P\_hss\_ntor}$.
+5. The introduction point forwards an `INTRODUCE2` message to the service, then acknowledges the client with `INTRODUCE_ACK`.
+
+Upon receiving `INTRODUCE2`, the hidden service:
+
+1. Decrypts the payload using $K_{S\_hss\_ntor}$.
+2. Learns the client's chosen rendezvous point.
+3. Builds a 3-hop circuit to the rendezvous point.
+4. Sends a `RELAY_COMMAND_RENDEZVOUS1` cell completing the ntor handshake.
+
+The rendezvous point splices the two circuits. All subsequent data flows as `RELAY_DATA` cells over the joined 6-hop circuit.
+
+---
+
+## 13. Stage 11: Descriptor Rotation and Expiry
+
+### 13.1 Expiry at the HSDir
+
+The `descriptor-lifetime` field specifies how long (in minutes, in $[30, 720]$) an HSDir should cache the descriptor. Per the specification, the HSDir **SHOULD** expire the descriptor at least `descriptor-lifetime` minutes after it was uploaded.
+
+### 13.2 Period-Driven Rotation
+
+When a new SRV is published, services rotate descriptors by:
+
+1. Discarding the current *first* descriptor.
+2. Promoting the *second* descriptor to *first*.
+3. Rebuilding a fresh *second* descriptor for the upcoming period with a new blinded key.
+
+Per the specification: "Services rotate their descriptor every time they receive a consensus with a valid_after time past the next SRV calculation time."
+
+### 13.3 Revision Counter Management
+
+Two approaches are noted in the specification's appendix: timestamp-based (using consensus time) and sequence-number-based. A service that loses state may issue a lower revision counter than a currently stored descriptor, which the HSDir will reject.
+
+---
+
+## 14. Packet Capture Characterisation
+
+<Aside type="caution" title="Critical Observability Boundary">
+All descriptor content, introduction-point addresses, onion addresses, and blinded keys travel inside encrypted Tor circuits. External network captures reveal only TLS metadata.
+</Aside>
+
+### 14.1 What Can Be Observed in Packet Captures
+
+Network-level captures between a Tor node and its guard relay reveal TLS records. Tor uses TLS 1.3 for all link-layer connections. What an external observer **can** observe:
+
+- **TLS connection metadata:** Source IP, destination IP, destination port (typically 443 or 9001), TLS handshake timing, and approximate record sizes.
+- **Approximate data volume:** The size and timing of TLS records carrying Tor cells; Tor cells are fixed at 512 bytes, so individual record sizes do not directly reveal payload content.
+- **Connection events:** Circuit establishment and teardown timing observable as TLS handshakes and TCP connection events.
+
+### 14.2 What Cannot Be Observed in Packet Captures
+
+The following are **not** observable from network captures without access to relay private keys:
+
+- **Descriptor plaintext:** The descriptor ciphertext is encrypted end-to-end inside the Tor circuit using onion encryption (AES-256-CTR with SHA3-256 digests).
+- **Descriptor contents:** The introduction-point list, introduction-point keys, and all second-layer plaintext.
+- **Blinded public key in transit:** While the blinded key is the DHT index, it travels inside the encrypted circuit.
+- **Which HSDir is being contacted:** The exit of the upload circuit is hidden from all but the last relay.
+- **Service identity:** The onion address is never transmitted in cleartext.
+- **Circuit purpose:** Whether a circuit is used for descriptor upload, introduction establishment, rendezvous, or ordinary exit traffic is not distinguishable from a passive external observer.
+
+### 14.3 What Can Be Observed via Instrumentation Inside Tor
+
+Observers with privileged access to a relay:
+
+- **At an HSDir relay:** The blinded public key index, raw descriptor ciphertext, `descriptor-lifetime`, and `revision-counter`. The HSDir cannot decrypt the first or second encryption layers without knowing the onion address.
+- **At an introduction-point relay:** Arrival of `ESTABLISH_INTRO` and `INTRODUCE2` messages and their timing, but not decrypted contents.
+- **At a rendezvous-point relay:** Arrival of `ESTABLISH_RENDEZVOUS` and `RENDEZVOUS1` cells and the splicing of two circuits.
+- **Via Tor's control port:** With control port access, `HS_DESC` and `HS_DESC_CONTENT` events expose the descriptor text and upload/fetch outcomes.
+
+### 14.4 Practical Packet Capture Procedure
+
+A reproducible packet capture of descriptor-related Tor traffic requires:
+
+1. Run a local Tor instance configured as a v3 onion service.
+2. Enable Tor's control port and subscribe to `HS_DESC` events.
+3. Use `tcpdump` or Wireshark to capture traffic on the relevant interface.
+4. Correlate control-port event timestamps with packet capture timestamps.
+
+**What such a capture shows:** TLS record timing and sizes associated with descriptor upload. Without relay-private-key access, the TLS records cannot be decrypted; only timing and size metadata are available.
+
+**Limitation:** Tor implements circuit padding mechanisms specifically to hinder traffic analysis of onion-service circuit setup. These padding machines (advertised as "Padding=2") make size-based inference about circuit purpose unreliable.
+
+---
+
+## 15. Stage 12: Failure Scenarios
+
+**HSDir Unavailability:** If an HSDir is unavailable during upload, that specific upload fails. Because services upload to multiple HSDirs per replica, partial failures may still leave descriptors reachable. The specification does not prescribe a retry policy beyond the re-upload timer.
+
+**Revision Counter Regression:** If a service loses state and restarts with a lower revision counter than the one currently stored at HSDirs, the HSDir will reject the new upload. Services should persist revision counters across restarts.
+
+**Key Rotation Failure:** If a service cannot re-derive the correct blinded key for the current period (e.g., due to clock skew), its descriptor will not be placed at the correct HSDir positions. Consistent use of consensus `valid-after` time mitigates clock-skew issues.
+
+**Introduction Circuit Failures:** If all introduction circuits are torn down before the service rebuilds them, clients may successfully download a descriptor but fail to reach any introduction point.
+
+---
+
+## 16. Stage 13: Operational Edge Cases
+
+**Multiple Simultaneous Descriptors:** Services maintain two concurrent active descriptors for different time-period/SRV combinations. Clients and services must apply the correct SRV selection logic to avoid mismatch.
+
+**Long-Running Services and Offline Keys:** The specification supports pre-generating multiple periods' worth of blinded signing keys offline. If the hidden service host is compromised, the adversary can only impersonate the service for the remaining pre-generated period count. The spec states that the private blinded signing key must not be sent to the hidden service host, as it would allow derivation of the master identity key.
+
+**Onion Service Scaling:** For high-availability deployments, operators can use OnionBalance to aggregate introduction points from multiple backend instances into a single descriptor.
+
+---
+
+## 17. Security Implications
+
+### 17.1 HSDir Privacy Properties
+
+A key v3 improvement over v2: HSDirs cannot learn the onion address from descriptor traffic alone. The descriptor index (blinded public key) changes daily; a single day's observation by a malicious HSDir reveals only the blinded key, not the permanent identity. Knowing the blinded key, without also knowing the onion address, does not allow decryption of the descriptor or tracking of the service across periods.
+
+### 17.2 Shadowing Attack Surface
+
+In the deprecated v2 protocol, an attacker could deterministically predict descriptor-ID positions and create relays positioned to receive all uploads for a target service. The v3 protocol mitigates this via the SRV: the shared random value changes each period and is generated by the directory authorities using a commit-and-reveal scheme, making HSDir positions unpredictable far in advance.
+
+### 17.3 Sybil Resistance
+
+The Tor directory authority system limits the number of relays from a single IP address to two in the consensus. This limits Sybil attacks targeting HSDir positions.
+
+### 17.4 Guard Node Correlation Attack
+
+Research has demonstrated that if an adversary controls a guard node for a hidden service and also controls an HSDir that the service uploads to, the adversary can correlate traffic signatures to de-anonymise the service's guard. This attack applies to v3 services. Current mitigations include persistent guard nodes and circuit padding.
+
+### 17.5 Descriptor-Lifetime Privacy Tradeoff
+
+A shorter `descriptor-lifetime` means more frequent uploads (more traffic events observable by an HSDir). A longer lifetime reduces upload frequency but increases the window during which a descriptor with stale introduction points may be served.
+
+---
+
+## 18. Limitations of Available Measurements
+
+- **Packet capture limitations:** External network captures reveal only TLS metadata. All payload content is encrypted. Claims about descriptor upload timing from traffic analysis alone are subject to uncertainty from Tor's circuit-padding mechanisms.
+- **HSDir visibility:** Any HSDir measurement study sees only the fraction of the descriptor hash ring it controls. Deriving global onion service counts from a single HSDir requires assumptions about uniform ring coverage.
+- **Ethical constraints:** Deploying HSDirs to collect descriptor data at scale constitutes data collection from the Tor network. The Tor Project considers targeted collection of onion addresses via HSDir relays to be malicious.
+- **Implementation divergence:** The C Tor implementation (reference) and alternative implementations (Arti, etc.) may diverge from the specification in transient ways.
+- **Consensus parameter variability:** HSDir spread and time-period parameters are configurable via consensus votes. Default values apply to the standard Tor network configuration as of the time of writing and may change.
+
+---
+
+## 19. Open Problems
+
+- **Accurate global service enumeration:** Estimating the total number of v3 onion services from partial HSDir coverage requires careful statistical modelling. Validation of estimation methods on the live network raises ethical and technical challenges.
+- **Descriptor upload timing measurement:** The jittered re-upload timer ($[60, 120]$ minutes) distributes upload load but has not been extensively measured empirically. Whether the distribution is uniform in practice is an open measurement question.
+- **Offline key deployment:** The specification describes offline key pre-generation, but as of 0.3.2.1-alpha this was not implemented in production C Tor. The current state of offline key support in recent Tor versions warrants verification.
+- **Proof-of-work effectiveness:** The proof-of-work client puzzle (introduced in Tor 0.4.8.1-alpha) is intended to mitigate DoS against introduction points. Its effectiveness against determined adversaries with significant computational resources is an active research question.
+- **Cross-period tracking resistance:** Although the blinded key changes each period, an observer controlling multiple HSDirs over time may correlate services across periods through traffic patterns. The extent of this residual correlation has not been rigorously quantified.
+- **Revision counter management:** The two revision-counter strategies described in the spec appendix have different failure-mode properties. Operational guidance on which to prefer under what conditions is not fully formalised.
+
+---
+
+## 20. Conclusion
+
+This paper has traced the complete lifecycle of a Tor v3 onion service descriptor, from Ed25519 identity-key generation and onion-address encoding, through blinded-key derivation, two-layer descriptor construction and signing, DHT-based HSDir placement, anonymous descriptor upload via 3-hop circuits, client retrieval, and eventual expiry. At each stage, the governing specification clause has been identified and, where implementation and specification may diverge, the difference has been noted.
+
+The packet-capture analysis reveals a fundamental observational asymmetry: external observers see only TLS-level metadata, while relay operators and instrumented Tor processes have access to substantially richer event data. This asymmetry is by design in the v3 protocol and represents a significant improvement over v2, where HSDir nodes could read descriptor plaintext.
+
+Open problems remain in accurate network measurement, offline-key deployment, and the long-term effectiveness of the proof-of-work DoS defence.
+
+---
+
+## References
+
+1. The Tor Project. "Tor Rendezvous Specification, Version 3 (rend-spec-v3.txt)." https://spec.torproject.org/rend-spec/ (accessed 2025).
+2. The Tor Project. "Protocol overview — Tor Rendezvous Specification v3." https://spec.torproject.org/rend-spec/protocol-overview.html (accessed 2025).
+3. The Tor Project. "Deriving blinded keys and subcredentials [SUBCRED]." https://spec.torproject.org/rend-spec/deriving-keys.html (accessed 2025).
+4. The Tor Project. "Hidden service descriptors: outer wrapper [DESC-OUTER]." https://spec.torproject.org/rend-spec/hsdesc-outer.html (accessed 2025).
+5. The Tor Project. "Hidden service descriptors: encryption format [HS-DESC-ENC]." https://spec.torproject.org/rend-spec/hsdesc-encrypt.html (accessed 2025).
+6. The Tor Project. "The introduction protocol [INTRO-PROTOCOL]." https://spec.torproject.org/rend-spec/introduction-protocol.html (accessed 2025).
+7. The Tor Project. "Appendix A: Signature scheme with key blinding [KEYBLIND]." https://spec.torproject.org/rend-spec/keyblinding-scheme.html (accessed 2025).
+8. The Tor Project. "Tor directory protocol, version 3 (dir-spec.txt)." https://spec.torproject.org/dir-spec/ (accessed 2025).
+9. The Tor Project. "Tor control protocol (control-spec.txt)." https://spec.torproject.org/control-spec/ (accessed 2025).
+10. The Tor Project. "Tor protocol specification (tor-spec.txt)." https://spec.torproject.org/tor-spec/ (accessed 2025).
+11. The Tor Project. "Circuit-level padding — Tor padding specification." https://spec.torproject.org/padding-spec/circuit-level-padding.html (accessed 2025).
+12. R. Dingledine, N. Mathewson, and P. Syverson. "Tor: The second-generation onion router." *Proc. 13th USENIX Security Symposium*, 2004, pp. 303–320.
+13. I. Goldberg, D. Stebila, and B. Ustaoglu. "Anonymity and one-way authentication in key exchange protocols." *Designs, Codes and Cryptography*, vol. 67, pp. 245–269, 2013.
+14. D. J. Bernstein, N. Duif, T. Lange, P. Schwabe, and B.-Y. Yang. "High-speed high-security signatures." *Proc. CHES 2011*, LNCS vol. 6917, pp. 124–142. Springer, 2011.
+15. L. Øverlier and P. Syverson. "Locating hidden servers." *Proc. IEEE Symposium on Security and Privacy (S&P)*, 2006, pp. 100–114.
+16. A. Biryukov, I. Pustogarov, and R.-P. Weinmann. "Trawling for Tor hidden services: Detection, measurement, deanonymization." *Proc. IEEE Symposium on Security and Privacy (S&P)*, 2013, pp. 80–94.
+17. T. Hoeller, R. Mayrhofer, M. Roland, A. Holler, and M. Schmiedecker. "On the state of V3 onion services." *Proc. USENIX FOCI*, 2021.
+18. C. Wang, J. Luo, Z. Ling, L. Luo, and X. Fu. "A comprehensive and long-term evaluation of Tor V3 onion services." *Proc. IEEE INFOCOM*, 2023.
+19. The Tor Project. "V3 onion services usage." Tor Blog, September 21, 2021. https://blog.torproject.org/v3-onion-services-usage/ (accessed 2025).
+20. The Tor Project. "OnionBalance." https://onionservices.torproject.org/apps/base/onionbalance/ (accessed 2025).

@@ -1,0 +1,478 @@
+---
+title: "Guard Node Selection Algorithm : The Math Behind Your First Hop Deep Dive into Path Selection Probability, Guard Rotation Policy, and Why Changing Guards Too Often Hurts Anonymity More Than It Helps."
+description: >
+  A protocol-level analysis of Tor's guard node selection algorithm,
+  bandwidth-weighted sampling, predecessor-attack defense, guard
+  persistence, guard rotation policy, Proposal 271, Proposal 291,
+  Vanguards, adversarial attacks, and unresolved research questions
+  surrounding long-term anonymity protection.
+author: "yottajunaid"
+authorUrl: "https://yottajunaid.github.io/Master-Darknet"
+keywords:
+  - Tor
+  - Tor network
+  - guard node
+  - entry guard
+  - first hop
+  - path selection
+  - guard selection algorithm
+  - bandwidth weighting
+  - bandwidth weighted sampling
+  - predecessor attack
+  - guard rotation
+  - guard persistence
+  - anonymity networks
+  - onion routing
+  - traffic analysis
+  - relay selection
+  - Tor Proposal 271
+  - Tor Proposal 291
+  - Vanguards
+  - guard discovery attacks
+  - guard placement attacks
+  - Sniper Attack
+  - AS-level adversaries
+  - directory consensus
+  - relay bandwidth
+  - anonymity research
+  - Tor specifications
+  - network security
+  - privacy engineering
+  - low-latency anonymity
+sidebar:
+  label: "Guard Node Selection Algorithm"
+tableOfContents:
+  minHeadingLevel: 2
+  maxHeadingLevel: 4
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+**Author:** yottajunaid                                                                                                                                   
+**Affiliation:** Master-Darknet Research Initiative — Cybersecurity, Forensics & Anonymous Networks Research Division  
+**Contact:** https://yottajunaid.github.io/Master-Darknet/contact  
+**Repository:** https://yottajunaid.github.io/Master-Darknet
+
+---
+
+## Abstract
+
+Guard nodes form the first hop of every Tor circuit and represent a critical architectural decision balancing anonymity, performance, and resistance to adversarial manipulation. This paper provides a technical examination of Tor's guard selection algorithm as specified in Tor Proposal 271, implemented in Tor 0.3.0.1-alpha, and subsequently refined through Proposals 291 and related specifications. We analyze the documented mathematical basis for guard persistence — the predecessor-attack probability model embedded in the official guard specification — and explain the weighted bandwidth sampling mechanisms that govern which relays are eligible to serve as guards. We survey the evolution of guard rotation policy from early fixed three-guard sets to the current sampled-set approach, examining the documented trade-offs between guard stability and adversarial exploitation. We identify and enumerate open research problems, including unresolved questions about optimal parameter tuning, load-balancing distortions introduced by doubly-skewed selection, guard-placement attacks against location-aware variants, and measurement gaps that limit empirical validation of theoretical anonymity claims. Throughout, we separate established specification facts from published research findings, operational observations, and unresolved hypotheses.
+
+**Keywords:** Tor, anonymous communication, entry guard, path selection, bandwidth weighting, predecessor attack, guard rotation, anonymity networks, onion routing
+
+---
+
+## 1. Introduction
+
+Tor [1] is a low-latency anonymous communication system used by millions of users daily. Clients build three-hop circuits — entry guard, middle relay, exit relay — where each relay knows only its immediate neighbors. The *entry guard* (also called the first hop or guard node) occupies a uniquely sensitive position: it is the only relay that simultaneously knows the client's real IP address and that the client is using Tor.
+
+This position creates a fundamental tension. If a client selected a fresh entry node for every circuit independently and uniformly at random, an adversary controlling a fraction of the network would gain increasing confidence over time about any individual client's traffic. The guard mechanism is Tor's primary defense against this class of long-term statistical attacks.
+
+This paper examines the guard selection algorithm from three perspectives:
+
+1. **Specification**: what the official Tor guard specification [2] and related proposals describe.
+2. **Implementation**: how the algorithm behaves in practice, including parameters published in the consensus.
+3. **Research context**: what peer-reviewed literature has established, contested, or left unresolved.
+
+We do *not* claim completeness. Guard selection interacts with censorship circumvention, network-level adversaries, load balancing, and onion-service security in ways that remain active research areas.
+
+---
+
+## 2. Background and Threat Model
+
+### 2.1 Predecessor Attack
+
+The core threat motivating guard nodes is the *predecessor attack* [11]. In a system where a client selects entry and exit nodes independently and uniformly at random from the full set of relays each time it builds a circuit, an adversary controlling a fraction $k/N$ of the network (where $N$ is the total number of relays and $k$ is the number of adversary-controlled relays) can deanonymize circuits as follows.
+
+The probability that a single circuit is deanonymized — that the adversary controls both the entry and exit — is, under uniform random selection:
+
+$$
+F = \left(\frac{k}{N}\right)^2
+\tag{1}
+$$
+
+The official Tor guard specification [2] states this directly: "an adversary who had $(k/N)$ of the network would deanonymize $F=(k/N)^2$ of all circuits." After a client has built $C$ independent circuits, the probability that the adversary has seen the client at least once approaches:
+
+$$
+P(\text{seen at least once}) = 1 - (1 - F)^C
+\tag{2}
+$$
+
+The guard specification notes that as $C$ grows large, this probability approaches 1 [2]. The guard mechanism interrupts this dynamic by fixing the entry relay.
+
+<Aside type="caution">
+Equations (1) and (2) are reproduced verbatim from the official Tor guard specification [2, 3]. They assume uniform random selection, independent circuits, and a passive adversary. They do **not** apply directly to the current weighted, guard-pinned Tor implementation, and should not be used to quantify anonymity under current Tor without careful qualification.
+</Aside>
+
+### 2.2 Guard Nodes as Defense
+
+Introduced in response to the attacks described in [11] and [12], guard nodes fix the entry relay to a small persistent set. If none of the client's guards are compromised, the client's traffic pattern cannot be linked across sessions by a relay-level adversary. The trade-off is that if a guard is compromised, the client has no defense from the entry position.
+
+### 2.3 Historical Evolution
+
+Early Tor deployments used three guard nodes with rotation periods on the order of 30–60 days (controlled by the now-removed `GuardLifetime` torrc option, which defaulted to 60 days in earlier versions and appeared in consensus parameters from Tor 0.2.4.12-alpha [9]). Proposal 236 [4] analyzed moving to a single guard node with a longer rotation period of approximately 9–10 months, and this change was deployed around 2014. Proposal 271 [3], implemented in Tor 0.3.0.1-alpha (2016), introduced the current sampled-set algorithm described in Section 4. Proposal 291 [5], designated "Finished" status, subsequently moved clients to using two primary guards by adjusting consensus parameters.
+
+---
+
+## 3. Guard Eligibility and Bandwidth Weighting
+
+### 3.1 Guard Flag Requirements
+
+A relay must carry specific consensus flags to be eligible for inclusion in the guard candidate set. According to the Tor guard specification [2] and path specification [8]:
+
+> `GUARDS` is the set of all guards in the current consensus that are usable for all circuits and directory requests. They must have the flags: `Stable, Fast, V2Dir, Guard.`
+
+The `Guard` flag itself is assigned by directory authorities based on criteria including uptime and bandwidth; the precise thresholds for the `Guard` flag assignment are defined in the directory specification [8] and may change across Tor versions.
+
+### 3.2 Bandwidth-Weighted Sampling
+
+When a relay is sampled from `GUARDS` into `SAMPLED_GUARDS`, selection is not uniform. The guard specification [2] states that sampling is "random but weighted by a measured bandwidth multiplied by bandwidth-weights (Wgg if guard only, Wgd if guard+exit flagged)."
+
+The bandwidth-weight parameters (`Wgg`, `Wgd`, `Wmg`, etc.) are computed by directory authorities and published in the consensus document. The path specification [8] defines the full weight table:
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Meaning</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>Wgg</code></td>
+      <td>Weight for Guard-only nodes in guard position</td>
+    </tr>
+    <tr>
+      <td><code>Wgd</code></td>
+      <td>Weight for Guard+Exit nodes in guard position</td>
+    </tr>
+    <tr>
+      <td><code>Wgm</code></td>
+      <td>Weight for non-flagged nodes in guard position</td>
+    </tr>
+    <tr>
+      <td><code>Wgb</code></td>
+      <td>Weight for <code>BEGIN_DIR</code>-supporting Guard nodes</td>
+    </tr>
+  </tbody>
+</table>
+
+*Table 1: Bandwidth Weight Parameters for Guard Position (from [8])*
+
+For a relay $i$ with measured bandwidth $B_i$ and position-appropriate weight $W_i$ (e.g., $W_i = \texttt{Wgg} \cdot B_i$ for a Guard-only relay in the guard position), the selection probability for the guard position among a candidate set $\mathcal{G}$ is:
+
+$$
+P(\text{select relay } i \text{ as guard})
+=
+\frac{W_i \cdot B_i}
+{\displaystyle\sum_{j \in \mathcal{G}} W_j \cdot B_j}
+\tag{3}
+$$
+
+The directory specification [8] defines how these weights are computed from the aggregate bandwidths of relay classes. The formula in (3) is a conceptual summary; the exact computation involves the `bwweightscale` parameter and is detailed in the directory specification's "Computing Bandwidth Weights" section.
+
+<Aside type="note">
+**Note on sampling bias**: Proposal 271 [3] includes an observation from Paul Syverson that the combination of bandwidth-weighted sampling into `SAMPLED_GUARDS` *and* subsequent confirmation bias toward lower-latency guards may produce a "doubly skewed" selection that under-utilizes some low-bandwidth guards. This is noted as an open question and a potential efficiency concern, not a resolved design decision.
+</Aside>
+
+---
+
+## 4. The Guard Selection Algorithm
+
+### 4.1 State Machine and Guard Sets
+
+The Proposal 271 algorithm [3, 2] maintains several interacting sets, illustrated in the state transition below:
+
+```
+relays listed in consensus
+           |
+         sampled
+         |     |
+   confirmed   filtered
+         |     |      |
+         primary      usable_filtered
+```
+
+The key sets are:
+
+- **SAMPLED_GUARDS**: A persistent set of guards the client has seen in consensus and may use. Persists across Tor restarts.
+- **FILTERED_GUARDS**: A non-persistent subset of `SAMPLED_GUARDS` reflecting current configuration and reachability constraints.
+- **USABLE_FILTERED_GUARDS**: The subset of `FILTERED_GUARDS` where `is_reachable` is `yes` or `maybe`.
+- **CONFIRMED_GUARDS**: A persistent ordered list of guards through which the client has actually built user-traffic circuits.
+- **PRIMARY_GUARDS**: A non-persistent ordered list of `N_PRIMARY_GUARDS` guards used preferentially.
+
+### 4.2 Circuit Selection Priority
+
+When building a new circuit, the algorithm proceeds in the following priority order [2]:
+
+1. If any `PRIMARY_GUARDS` entry has reachability status `maybe` or `yes`, select uniformly at random from the first `NUM_USABLE_PRIMARY_GUARDS` reachable primary guards that satisfy path restrictions. The circuit is `usable_on_completion`.
+
+2. Otherwise, if the ordered intersection of `CONFIRMED_GUARDS` and `USABLE_FILTERED_GUARDS` is non-empty, return the first non-pending entry and mark it pending. The circuit is `usable_if_no_better_guard`.
+
+3. Otherwise, select from `USABLE_FILTERED_GUARDS` in sample order. Circuit is `usable_if_no_better_guard`.
+
+4. In the worst case, if `USABLE_FILTERED_GUARDS` is empty, mark all guards as `maybe` reachable and retry.
+
+This priority ordering ensures that clients prefer confirmed, primary guards, use exploratory circuits minimally, and avoid committing to non-primary guards until primary guards are confirmed unreachable.
+
+### 4.3 Circuit State Machine
+
+Every circuit is in one of four states [2]:
+
+- `usable_on_completion`: Will be used once built.
+- `usable_if_no_better_guard`: Will be used only if no better guard is available.
+- `waiting_for_better_guard`: On hold pending confirmation that higher-priority guards are unavailable.
+- `complete`: Available for stream attachment.
+
+Only `complete` circuits may have streams attached.
+
+---
+
+## 5. Guard Rotation Policy and Lifetime Parameters
+
+### 5.1 Removal Conditions
+
+A guard is removed from `SAMPLED_GUARDS` under two conditions [2]:
+
+1. The guard has not appeared in any consensus for more than `REMOVE_UNLISTED_GUARDS_AFTER` days; or
+2. The guard was added more than `GUARD_LIFETIME` days ago *and* was either never confirmed or was confirmed more than `GUARD_CONFIRMED_MIN_LIFETIME` days ago.
+
+The consensus parameters controlling these thresholds are specified in the Tor parameter specification [9]:
+
+<table>
+  <thead>
+    <tr>
+      <th>Parameter</th>
+      <th>Default</th>
+      <th>First Appeared In</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>guard-lifetime-days</code></td>
+      <td>120 days</td>
+      <td>Tor 0.3.0</td>
+    </tr>
+    <tr>
+      <td><code>guard-confirmed-min-lifetime-days</code></td>
+      <td>60 days</td>
+      <td>Tor 0.3.0</td>
+    </tr>
+    <tr>
+      <td><code>guard-remove-unlisted-guards-after-days</code></td>
+      <td>20 days</td>
+      <td>Tor 0.3.0</td>
+    </tr>
+  </tbody>
+</table>
+
+*Table 2: Guard Lifetime Consensus Parameters (from [9])*
+
+<Aside type="caution">
+The `GuardLifetime` torrc option (which defaulted to 60 days in older Tor versions) was **removed** in Tor 0.3.0 and replaced by the consensus-driven parameters listed above [9]. Operational guard lifetime is now governed by the consensus, not individual client configuration.
+</Aside>
+
+The `ADDED_ON_DATE` field is randomized to a point in the past using `RAND(now, GUARD_LIFETIME/10)` to prevent all clients from rotating guards simultaneously [2].
+
+### 5.2 Why Rapid Rotation Reduces Anonymity
+
+The guard specification [2] motivates guard persistence explicitly: frequent rotation increases the probability that the client will eventually select a compromised relay. The cumulative exposure model (Equations (1) and (2)) shows that each fresh random selection is an independent draw from the guard distribution, and therefore each new guard is a new opportunity for an adversary-controlled relay to become the client's entry node.
+
+Long-term guard persistence means the client's exposure to compromise is front-loaded: if the initial guard is clean, it remains clean. By contrast, frequent rotation repeatedly samples from the full guard distribution, which, per the predecessor attack model, asymptotically guarantees adversarial observation over time.
+
+Proposal 236 [4] analyzed a specific scenario — moving from three guards with short rotation to one guard with longer rotation — and concluded that a single long-term guard reduces the number of "observation windows" an adversary has. However, it also noted that a single guard presents a single point of failure if that guard is compromised, and that network dynamism (guard churn, relay failures) creates practical challenges.
+
+### 5.3 The Guard Pinning and Fingerprinting Tension
+
+Longer guard lifetimes increase anonymity against the predecessor attack but create a distinct risk: an adversary who can *identify* a client's guard can mount targeted attacks. The Tor Project blog [18] noted that identifying the guard of a hidden service is particularly feasible because an adversary can force the service to build new circuits at will.
+
+This creates an unresolved tension: the parameters that best resist the predecessor attack (long lifetimes, few guards) are the same parameters that give an adversary the most time to identify and exploit the guard once discovered.
+
+---
+
+## 6. Number of Guards: From Three to One to Two
+
+### 6.1 Three-Guard Era
+
+Early Tor used three guard nodes. The rationale was that if one guard failed or was unreachable, the client could fall back to another without rebuilding its entire guard set. Three guards also spread the observability risk across multiple relays.
+
+### 6.2 Single Guard (Proposal 236)
+
+Proposal 236 [4] argued for moving to one guard with a longer rotation period. The key reasoning was:
+
+- Three guards triple the number of relays that can observe the client's entry traffic, increasing the probability that at least one is adversarial.
+- A single guard with a longer lifetime limits the total number of entities that ever observe the client's entry traffic.
+- As noted in the proposal, moving from three guards to one guard was motivated by the goal "to limit points of observability of entry into the Tor network for clients."
+
+This change was deployed approximately in 2014.
+
+### 6.3 Two-Guard Return (Proposal 291)
+
+Proposal 291 [5] documented the rationale for returning to two primary guards. The critical observation was that Tor's path restrictions — which prevent the same relay or same /16 subnet from appearing multiple times in a circuit — already caused clients to effectively use a second guard whenever their primary guard (or a relay in the same family) appeared in another circuit position.
+
+Proposal 291 states: "because of Tor's path restrictions, we're already using two guards, but we're using them in a suboptimal and potentially dangerous way." The proposal formalized the use of two guards via the `guard-n-primary-guards-to-use` consensus parameter.
+
+The guard-node selection algorithm itself (from Proposal 271) was not changed; only the consensus parameters controlling how many primary guards are "in use" simultaneously were adjusted [5].
+
+---
+
+## 7. Adversarial Attacks Against the Guard Layer
+
+### 7.1 Guard Bypass via Denial of Service
+
+Proposal 271 [3] explicitly considers an adversary who can make legitimate guards appear unreachable by mounting denial-of-service attacks or controlling a firewall between the client and the Tor network. If the client's current guards become unreachable, the algorithm falls back to non-primary guards from the sampled set. If all sampled guards are exhausted, new guards are sampled from the current consensus — which the adversary may influence by running high-bandwidth relays.
+
+The algorithm resists this by: (a) ordering guards to prefer long-confirmed, primary guards, (b) maintaining a sampled set large enough that the adversary must exhaust many guards before a new one is sampled, and (c) randomizing removal times to prevent coordinated replacement.
+
+### 7.2 Guard Placement Attack
+
+Wan et al. [13] formalized the *guard placement attack*, in which an adversary deploys malicious relays in network locations selected to maximize the probability of being chosen as a client's guard under location-aware path selection algorithms. The study found that three location-aware algorithms — Counter-RAPTOR, DeNASA, and LASTor — were vulnerable to this attack. The paper reports that in one evaluated scenario, an adversary contributing only 0.216% of total network bandwidth achieved an average guard selection probability of 18.22%, substantially higher than what an equivalent bandwidth contribution would achieve under standard Tor [13].
+
+<Aside type="note">
+**Scope note**: This attack applies specifically to location-aware path selection variants, not to the default Tor bandwidth-weighted algorithm described in this paper. The default algorithm does not use client or relay geographic location. The cited figures are not directly applicable to baseline Tor behavior.
+</Aside>
+
+### 7.3 Sniper Attack and Guard Enumeration
+
+The Sniper Attack [14] identified a mechanism by which an adversary could anonymously crash guard relays, potentially forcing a client to cycle through its guard set and eventually select an adversary-controlled relay. Defenses against guard enumeration and forced rotation remain an active research area [18].
+
+### 7.4 Congestion-Aware Guard Selection
+
+Panchenko et al. [15] proposed congestion-aware path selection to improve performance by accounting for current relay load. The baseline Tor algorithm uses measured bandwidth from the most recent consensus document, which may lag actual relay load. The performance implications and potential deanonymization side-effects of load-aware selection are an open research question.
+
+---
+
+## 8. Vanguards: Multi-Layer Guard Protection for Onion Services
+
+Standard guard selection protects the entry point of client circuits. For onion services (hidden services), the threat model includes guard discovery attacks in which an adversary can force the service to build many circuits and observe which of the adversary's relays appear as middle nodes, eventually identifying the service's guard [6].
+
+The Tor Vanguards specification [7] defines two variants:
+
+- **Full Vanguards**: A three-layer guard structure for long-lived onion services, with separate guard sets at each layer and distinct rotation schedules.
+- **Vanguards-Lite**: A two-layer structure for onion clients and short-lived services.
+
+Proposal 247 [6] specifies the rotation parameters for the second and third guard layers, including minimum and maximum lifetimes chosen to make Sybil-based guard discovery attacks impractical within a reasonable time window.
+
+---
+
+## 9. Established Facts vs. Research Findings vs. Open Questions
+
+To meet the verification requirements of this paper, we explicitly separate the following categories.
+
+### 9.1 Established Facts (Documented in Official Specifications)
+
+1. The mathematical motivation for guards — Equations (1) and (2) — appears verbatim in the guard specification [2] and Proposal 271 [3].
+2. Guard eligibility requires the flags `Stable, Fast, V2Dir, Guard` [2].
+3. Sampling is bandwidth-weighted using consensus parameters `Wgg` (Guard-only) and `Wgd` (Guard+Exit) [2, 8].
+4. The current consensus parameters for guard lifetime are 120 days (`guard-lifetime-days`), 60 days (`guard-confirmed-min-lifetime-days`), and 20 days (`guard-remove-unlisted-guards-after-days`), all with first-appearance in Tor 0.3.0 [9].
+5. Proposal 271 was implemented in Tor 0.3.0.1-alpha [3].
+6. Proposal 291 moved clients to two primary guards via consensus parameters [5].
+7. The old `GuardLifetime` torrc option (defaulting to 60 days) was removed in Tor 0.3.0 [9].
+
+### 9.2 Published Research Findings
+
+1. Guard placement attacks are effective against location-aware path selection algorithms [13].
+2. Entry guards were added in response to the predecessor attack [11] and hidden-service location attacks [12], as documented in [16].
+3. The Sniper Attack demonstrated that guard relay processes could be crashed, potentially forcing guard re-selection [14].
+4. Congestion-aware path selection can improve throughput relative to the bandwidth-weighted baseline [15].
+
+### 9.3 Open Questions and Unresolved Problems
+
+1. **Doubly-skewed selection**: Proposal 271 [3] notes that bandwidth-weighted sampling combined with confirmation bias toward low-latency guards may under-utilize some relays. This has not been resolved in the specification and is flagged as an area requiring simulation study.
+2. **Optimal guard lifetime**: The Tor Project blog [18] and related research acknowledge that the optimal trade-off between guard stability (resisting predecessor attacks) and guard exposure (to targeted attacks once identified) is not known with precision.
+3. **AS-level adversaries**: Research on autonomous-system-level adversaries [19] continues to reveal that even a client with a non-compromised guard relay may be deanonymized by an adversary that can observe traffic at the network layer. The guard mechanism does not address this threat.
+4. **Guard enumeration timing**: The rate at which a persistent guard can be identified through side-channel methods under the current algorithm is not precisely characterized in any published measurement study known to us.
+5. **Load-balancing under persistent guards**: The interaction between guard persistence and Tor's bandwidth-weighted load balancing creates distortions that are acknowledged in the specifications but not fully characterized empirically [18, 5].
+6. **Parameter sensitivity**: Whether the default values of `guard-lifetime-days` (120) and `guard-confirmed-min-lifetime-days` (60) are optimal for the current network topology and adversary model has not been demonstrated. These values appear to be reasonable engineering choices rather than outputs of a formal optimization.
+
+---
+
+## 10. Limitations of Existing Research
+
+### 10.1 Measurement Limitations
+
+- Tor's design makes it difficult to measure client guard selection behavior from the network, since guard selection occurs at the client and is not published externally.
+- Simulation studies (e.g., using Shadow [20] or TorPS) must make assumptions about client behavior, network topology, and adversary capabilities that may not match the live network.
+- Bandwidth measurements published in the consensus are estimates from bandwidth authority probing, not real-time load measurements, limiting the accuracy of the selection probability model.
+
+### 10.2 Theoretical Limitations
+
+- The deanonymization probability model in Equations (1) and (2) assumes independent circuit selection and a passive adversary, neither of which holds in practice under the current guard algorithm.
+- The model does not account for guard downtime, relay churn, or the client's fallback behavior during guard unavailability.
+- Formal anonymity bounds for the current algorithm (as opposed to the simplified random-selection model) have not been derived in a form that is directly usable by network operators or researchers.
+
+### 10.3 Implementation Gaps
+
+- The behavior of Tor clients during periods of intermittent guard reachability — and specifically, the conditions under which a client falls through to the worst-case path in the algorithm — is not well-characterized in available measurement literature.
+- The interaction between the guard algorithm and Tor's path-restriction rules (same-family, same-/16 exclusions) has implications for effective guard selection probability that are acknowledged in Proposal 291 but not formally analyzed.
+
+---
+
+## 11. Discussion
+
+The guard selection algorithm reflects a series of deliberate engineering decisions under uncertainty. The choice of bandwidth weighting, rather than uniform random selection, reflects the network's load-balancing needs; the choice of persistent, sampled guard sets rather than per-circuit random selection reflects the threat model from the predecessor attack. Both choices involve trade-offs that have not been fully resolved.
+
+The move from three guards to one and then to two is illustrative: each transition was motivated by analysis of a specific threat (observability reduction; then path-restriction interaction), but the long-term optimal configuration remains unknown. The guard specification itself acknowledges this by making the number of primary guards a consensus parameter rather than a hardcoded constant, preserving the ability to adjust it as understanding improves.
+
+The guard-placement attack literature [13] highlights that alternative path selection algorithms — even those designed to improve security — may introduce new attack surfaces. This suggests that changes to the guard selection algorithm should be evaluated not only against the threat they are designed to address but also against the new attack surfaces they may create.
+
+---
+
+## 12. Conclusion
+
+The Tor guard selection algorithm is a carefully layered state machine designed to protect clients against long-term traffic analysis while remaining functional under censorship, relay failures, and adversarial relay placement. Its mathematical motivation — the predecessor attack probability model — is documented in the official specification and provides an intuitive justification for guard persistence. The algorithm's actual behavior is governed by bandwidth-weighted sampling, a multi-tier guard set hierarchy, and consensus-tunable lifetime parameters.
+
+Key established facts include: guard eligibility requires four consensus flags; sampling is weighted by `Wgg` or `Wgd` multiplied by measured bandwidth; the current default guard lifetime for unconfirmed guards is 120 days; the default confirmed guard minimum lifetime is 60 days; and the algorithm was substantially redesigned in Proposal 271 (implemented in Tor 0.3.0.1-alpha) and subsequently adjusted by Proposal 291.
+
+Key open questions include: the practical impact of doubly-skewed sampling on load distribution; the optimal guard lifetime under realistic adversary models; the interaction between guard persistence and AS-level adversaries; and the conditions under which guard enumeration attacks become feasible under the current parameter settings.
+
+---
+
+## Acknowledgments
+
+The authors thank the Tor Project and the Tor research community for publishing detailed specifications, proposals, and research that made this analysis possible.
+
+---
+
+## References
+
+[1] R. Dingledine, N. Mathewson, and P. Syverson, "Tor: The Second-Generation Onion Router," in *Proc. 13th USENIX Security Symposium*, 2004.
+
+[2] N. Mathewson et al., "Tor Guard Specification," Tor Project, https://spec.torproject.org/guard-spec/, accessed 2025.
+
+[3] I. Lovecruft, G. Kadianakis, O. Bini, and N. Mathewson, "Proposal 271: Another algorithm for guard selection," Tor Design Proposals, 2016, implemented in Tor 0.3.0.1-alpha.
+
+[4] R. Dingledine, "Proposal 236: The move to a single guard node," Tor Design Proposals, 2014.
+
+[5] M. Perry, "Proposal 291: The move to two guard nodes," Tor Design Proposals, 2018.
+
+[6] M. Perry, "Proposal 247: Defending against guard discovery attacks using vanguards," Tor Design Proposals.
+
+[7] Tor Project, "Tor Vanguards Specification," https://torspec-12e191.pages.torproject.net/vanguards-spec/, accessed 2025.
+
+[8] Tor Project, "Path Selection and Constraints," Tor Specifications, https://spec.torproject.org/path-spec/, accessed 2025.
+
+[9] Tor Project, "Tor Network Parameters Specification," https://spec.torproject.org/param-spec.html, accessed 2025.
+
+[10] Tor Project, "Guard nodes," https://spec.torproject.org/path-spec/guard-nodes.html, accessed 2025.
+
+[11] M. Wright, M. Adler, B. N. Levine, and C. Shields, "The Predecessor Attack: An Analysis of a Threat to Anonymous Communications Systems," *ACM Trans. Inf. Syst. Secur.*, vol. 7, no. 4, pp. 489–522, 2004.
+
+[12] L. Øverlier and P. Syverson, "Locating Hidden Servers," in *Proc. IEEE Symposium on Security and Privacy*, 2006, pp. 100–114.
+
+[13] G. Wan, A. Johnson, R. Wails, S. Wagh, and P. Mittal, "Guard Placement Attacks on Path Selection Algorithms for Tor," in *Proc. Privacy Enhancing Technologies (PoPETs)*, 2019.
+
+[14] R. Jansen, F. Tschorsch, A. Johnson, and B. Scheuermann, "The Sniper Attack: Anonymously Deanonymizing and Disabling the Tor Network," in *Proc. NDSS*, 2014.
+
+[15] A. Panchenko, F. Lanze, and T. Engel, "Improving Performance and Anonymity in the Tor Network," in *Proc. IEEE IPCCC*, 2012.
+
+[16] R. Dingledine and N. Mathewson, "Performance and Security Improvements for Tor: A Survey," IACR ePrint 2015/235, 2015.
+
+[17] Tor Project, "Appendices — Guard Specification," https://spec.torproject.org/guard-spec/appendices.html, accessed 2025.
+
+[18] R. Dingledine, "Improving Tor's anonymity by changing guard parameters," Tor Project Blog, October 2013, https://blog.torproject.org/improving-tors-anonymity-changing-guard-parameters/.
+
+[19] Tor Project and collaborators, "An Extended View on Measuring Tor AS-level Adversaries," arXiv:2403.08517, 2024.
+
+[20] R. Jansen and N. Hopper, "Shadow: Running Tor in a Box for Accurate and Efficient Experimentation," in *Proc. NDSS*, 2012.
