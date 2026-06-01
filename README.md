@@ -10,7 +10,9 @@
 
 ## 🚀 **[START LEARNING HERE: Master-Darknet Live Site](https://yottajunaid.github.io/Master-Darknet/)** 🚀
 
----
+
+**Topics:**  
+Darknet • Deep Web • Dark Web • Tor • Tor Browser • Onion Services • Hidden Services • Onion Routing • Anonymity • Anonymous Networks • Privacy • Internet Privacy • Digital Privacy • Online Privacy • Privacy Tools • OPSEC • Operational Security • Cybersecurity • Information Security • Digital Security • Network Security • Cryptography • Security Research • Security Education • Cyber Defense • Cyber Awareness • Ethical Hacking • OSINT • Counter-OSINT • Threat Intelligence • Privacy Engineering • Tor Network • I2P • Freenet • Lokinet • Nym • Yggdrasil • Mixnets • Decentralized Networks • Tails • Whonix • Qubes OS • Linux Security • Homelab • Cyber Lab • Surveillance • Anti-Surveillance • Censorship Resistance • Internet Freedom • Digital Rights • Research • Academic Research • Educational Resources • Learning Path • Study Material • Knowledge Base • Open Source Education
 
 ## 📘 What is Master-Darknet?
 
